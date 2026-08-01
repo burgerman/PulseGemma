@@ -1,0 +1,15 @@
+:root {
+  /* ER High-Contrast Color Palette Tokens */
+  --color-esi-1: #DC2626; /* Immediate Resuscitation - Red 600 */
+  --color-esi-2: #EA580C; /* High Risk / Emergent - Orange 600 */
+  --color-esi-3: #CA8A04; /* Urgent - Yellow 600 */
+  --color-esi-4: #2563EB; /* Less Urgent - Blue 600 */
+  --color-esi-5: #059669; /* Non-Urgent - Emerald 600 */
+
+  --color-critical-bg: rgba(220, 38, 38, 0.15);
+  --color-critical-border: rgba(220, 38, 38, 0.4);
+  --color-warning-bg: rgba(217, 119, 6, 0.15);
+  --color-warning-border: rgba(217, 119, 6, 0.4);
+  --color-normal-bg: rgba(5, 150, 105, 0.15);
+  --color-normal-border: rgba(5, 150, 105, 0.4);
+}
