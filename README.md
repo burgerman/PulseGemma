@@ -1,10 +1,10 @@
 # 🫀 PulseGemma
 ### Grounded Edge-AI Clinical Triage & Decision-Support Assistant
-> **"Sub-second patient history synthesis, 100% deterministic safety rules, multimodal vision scanning, hands-free voice dictation, and multilingual clinical translation—powered by local Gemma models on the edge."**
+> **"Sub-second patient history synthesis, 100% deterministic safety rules, multimodal vision scanning, hands-free voice dictation, and multilingual clinical translation—powered by local Gemma 4 12B models on the edge."**
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-burgerman%2FPulseGemma-blue?logo=github)](https://github.com/burgerman/PulseGemma.git)
 [![Target Platform](https://img.shields.io/badge/Platform-Local%20Edge%20%2F%20Offline%20First-emerald)](#-architecture-overview)
-[![AI Foundation](https://img.shields.io/badge/AI-Ollama%20%2B%20Google%20Gemma-orange)](#-grounded-ai--gemma-integration)
+[![AI Foundation](https://img.shields.io/badge/AI-Ollama%20%2B%20Gemma%204%2012B-orange)](#-grounded-ai--gemma-integration)
 [![Safety Philosophy](https://img.shields.io/badge/Safety-Deterministic%20Safety%20First-red)](#-clinical-safety--non-chatbot-philosophy)
 
 ---
@@ -13,7 +13,7 @@
 
 In emergency medical settings, **seconds save lives, but information overload paralyzes clinicians**. Emergency Department (ED) nurses and physicians are routinely swamped with multi-page Electronic Health Records (EHRs), complex lab panels, radiology notes, paper printouts, and language barriers—all while needing to assign accurate **Emergency Severity Index (ESI)** triage scores under severe time pressure.
 
-**PulseGemma** is a production-grade, edge-deployed clinical assistant built for healthcare workers. Designed specifically to solve real ER pain points, PulseGemma rejects the unsafe "probabilistic chatbot" approach. Instead, it pairs **100% deterministic client-side rule engines** (for reference ranges and validated clinical scoring) with **grounded language, vision, and translation AI** operating strictly over authoritative clinical practice guidelines (CPGs) and patient data.
+**PulseGemma** is a production-grade, edge-deployed clinical assistant built for healthcare workers. Powered locally by **Ollama Gemma 4 12B**, PulseGemma rejects the unsafe "probabilistic chatbot" approach. Instead, it pairs **100% deterministic client-side rule engines** (for reference ranges and validated clinical scoring) with **grounded language, vision, and translation AI** operating strictly over authoritative clinical practice guidelines (CPGs) and patient data.
 
 ---
 
@@ -43,13 +43,21 @@ In emergency medical settings, **seconds save lives, but information overload pa
 ### Pillar 1: Instant Patient History & Triage Summarizer
 - **5-Second EHR Intake Brief**: Transforms complex past medical records into a clean, 5-point clinical snapshot for incoming shift staff.
 - **Red Flag Extractor**: Pulls forward critical risk factors (e.g. *History of CABG*, *Current Anticoagulant Use*, *Anaphylactic Penicillin Allergy*).
-- **Multimodal Lab Sheet OCR (Gemma Vision)**: Allows nurses to snap a photo of paper lab printouts or ECG strips, extracting structured data into the digital intake flow.
-- **Multilingual Voice & Oral Symptom Intake**: Enables patients with Limited English Proficiency (LEP) to speak or type in their native language (Spanish, Mandarin, Cantonese, Arabic, Vietnamese, Tagalog, Hindi, French, etc.). Gemma automatically translates spoken symptoms into standardized English clinical terminology for medical staff, and can output patient instructions back in their native language.
+- **Multimodal Lab Sheet OCR (Gemma 4 Vision)**: Allows nurses to snap a photo of paper lab printouts or ECG strips, extracting structured data into the digital intake flow.
+- **Multilingual Voice & Oral Symptom Intake**: Enables patients with Limited English Proficiency (LEP) to speak or type in their native language (Spanish, Mandarin, Cantonese, Arabic, Vietnamese, Tagalog, Hindi, French, etc.). Gemma 4 12B automatically translates spoken symptoms into standardized English clinical terminology for medical staff, and can output patient instructions back in their native language.
 
 ### Pillar 2: Deterministic Triage & Decision-Support Assistant
 - **0% Hallucination Safety Engine**: Hardcoded TypeScript algorithms evaluate numerical reference ranges (Troponin, Lactate, Potassium, WBC) and validated scoring systems (qSOFA for Sepsis, Wells Score for PE) with zero model guesswork.
 - **ESI v4 Flowchart Engine**: Evaluates patient vitals and chief complaints against ESI level criteria (Levels 1–5), reducing human error under pressure.
 - **Grounded Guideline Correlation (RAG)**: Cross-references patient presentation against local clinical practice guidelines (AHA Chest Pain Protocol, Surviving Sepsis Campaign) with **direct, clickable citations**.
+
+---
+
+## 📄 Key Feature Specification Blueprints
+
+1. 🔴 **[Deterministic Range Checker Engine](feature_deterministic_range_checker.md)**: 0ms client-side calculation of critical high/low lab thresholds with 0% model guesswork.
+2. 🎙️ **[Hands-Free Voice Dictation & Symptom NLU](feature_handsfree_voice_dictation.md)**: Real-time speech-to-text in 20+ languages with Gemma 4 12B structured clinical entity extraction.
+3. 📚 **[Grounded CPG RAG Retrieval Engine](feature_grounded_cpg_rag.md)**: Local RAG retrieval matching patient findings against verbatim Emergency Clinical Practice Guidelines (AHA, Sepsis, ESI v4).
 
 ---
 
@@ -63,7 +71,7 @@ In emergency medical settings, **seconds save lives, but information overload pa
         ┌──────────────────────────────────┼──────────────────────────────────┐
         ▼                                  ▼                                  ▼
  ┌──────────────┐                 ┌──────────────────┐               ┌─────────────────┐
- │ Structured   │                 │ Gemma Vision     │               │ Multilingual    │
+ │ Structured   │                 │ Gemma 4 Vision   │               │ Multilingual    │
  │ Labs & Vitals│                 │ (X-Ray / Lab OCR)│               │ Voice & Speech  │
  └──────┬───────┘                 └────────┬─────────┘               └────────┬────────┘
         │                                  │                                  │
@@ -71,7 +79,7 @@ In emergency medical settings, **seconds save lives, but information overload pa
                                            │
                                            ▼
  ┌────────────────────────────────────────────────────────────────────────┐
- │ 1. Multilingual Translation & Medical Entity Normalizer                │
+ │ 1. Multilingual Translation & Medical Entity Normalizer (Gemma 4 12B)  │
  │    - Translates non-English symptoms to English clinical terms.        │
  └──────────────────────────────────┬─────────────────────────────────────┘
                                     │
@@ -90,27 +98,12 @@ In emergency medical settings, **seconds save lives, but information overload pa
                                     │ (Strict Guideline Context)
                                     ▼
  ┌────────────────────────────────────────────────────────────────────────┐
- │ 4. Gemma Edge Reasoning Engine                                         │
+ │ 4. Gemma 4 12B Edge Reasoning Engine                                   │
  │    - Synthesizes findings ONLY from steps 2 & 3.                       │
  │    - Generates English clinical brief & Native-Language patient notes. │
  │    - Every recommendation requires a clickable [Source Citation].      │
  └────────────────────────────────────────────────────────────────────────┘
 ```
-
----
-
-## ⚡ Key Features
-
-| Feature | Description | Clinical Value |
-| :--- | :--- | :--- |
-| 🌐 **Multilingual Clinical Translation** | Real-time translation of oral/written non-English patient descriptions into standardized English medical terms. | Eliminates communication barriers for Limited English Proficiency (LEP) patients. |
-| 🔴 **Deterministic Range Checker** | 0ms client-side calculation of critical high/low lab thresholds (Troponin, Potassium, Lactate). | Eliminates delayed recognition of acute lab anomalies with zero hallucination. |
-| 📊 **ESI v4 Triage Engine** | Rule-based decision tree for ESI Level 1 (Immediate) through ESI Level 5 (Non-urgent). | Standardizes triage classification across nurse experience levels. |
-| 🖼️ **Multimodal Vision Scanning** | Gemma Vision analysis for Chest X-Ray scans, paper lab printouts, and ECG strips. | Digitizes physical paperwork and assists with visual radiologic findings. |
-| 🎙️ **Hands-Free Voice Dictation** | Real-time speech-to-text with auto-extraction of pain severity, onset, and anatomical location. | Hands-free bedside symptom entry for patients and triage nurses. |
-| 📚 **Grounded CPG RAG** | Retrieval-Augmented Generation constrained to local emergency practice guidelines. | Ensures all AI reasoning is backed by authoritative medical literature. |
-| 🔗 **Clickable Guideline Citations** | Every AI output includes interactive source links (`[AHA 2023 Sec 4.2]`). | Provides complete transparency and auditability for clinical staff. |
-| 💻 **100% Offline Edge Mode** | Connects to local Ollama instance (`http://localhost:11434`) with built-in offline simulator. | Ensures zero HIPAA cloud leakage and 100% uptime during network outages. |
 
 ---
 
@@ -120,7 +113,7 @@ Healthcare applications must not be built as conversational chatbots. Language m
 
 **PulseGemma enforces a strict safety boundary**:
 1. **Hard Mathematical Facts**: Calculated strictly by deterministic code (TypeScript).
-2. **Grounded Reasoning**: Gemma is restricted to organizing and explaining facts derived from step 1 and retrieved ground-truth guidelines.
+2. **Grounded Reasoning**: Gemma 4 12B is restricted to organizing and explaining facts derived from step 1 and retrieved ground-truth guidelines.
 3. **Human-in-the-Loop Governance**: Formatted as **Clinical Decision Support (CDS)**—the final clinical judgment always rests with the attending healthcare professional.
 
 ---
@@ -129,9 +122,9 @@ Healthcare applications must not be built as conversational chatbots. Language m
 
 * **Frontend**: React 18, TypeScript, Vite, TailwindCSS, Lucide Icons.
 * **Audio Engine**: Web Speech API (`SpeechRecognition`) with multilingual language selection (20+ languages).
-* **Translation Core**: Gemma Multilingual NLU for medical term normalization.
+* **Translation Core**: Gemma 4 12B Multilingual NLU for medical term normalization.
 * **Deterministic Engine**: Custom TypeScript Clinical Calculators (qSOFA, Wells, TIMI, ESI v4).
-* **AI Core**: Ollama API (`gemma2`, `gemma3`, `gemma4-vision`) with fallback offline engine.
+* **AI Core**: Ollama local API (`gemma4:12b`) with fallback offline engine.
 
 ### Quick Start (Local Development)
 
@@ -143,8 +136,8 @@ cd PulseGemma
 # 2. Install dependencies
 npm install
 
-# 3. (Optional) Run Ollama locally with Gemma
-ollama run gemma2
+# 3. Pull & Run Ollama Gemma 4 12B locally
+ollama run gemma4:12b
 
 # 4. Start local development server
 npm run dev
