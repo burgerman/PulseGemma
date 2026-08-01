@@ -8,7 +8,7 @@
 ## 📂 1. Directory Tree & Code Structure
 
 ```
-d:\Clinical Triage\
+PulseGemma/
 ├── index.html                           # Entry HTML with meta tags & Google Fonts
 ├── package.json                         # Dependencies & npm scripts
 ├── tsconfig.json                        # Strict TypeScript configuration
@@ -81,13 +81,60 @@ d:\Clinical Triage\
 ## ⚙️ 2. Production Coding Standards
 
 ### 🛡️ Rule A: Strict Type Safety (No `any`, No Implicit Casting)
-- All data models MUST use `readonly` properties for state snapshots.
-- `tsconfig.json` MUST enforce `"strict": true`, `"noImplicitAny": true`, `"noUnusedLocals": true`.
+
+```typescript
+// ❌ UNACCEPTABLE (Weak, unsafe code)
+function processLab(data: any) {
+  return data.val > 0.04 ? "CRITICAL" : "OK";
+}
+
+// ✅ PRODUCTION STANDARD (Strict types, explicit contracts)
+export type LabStatus = 'CRITICAL_HIGH' | 'CRITICAL_LOW' | 'ABNORMAL_HIGH' | 'ABNORMAL_LOW' | 'NORMAL';
+
+export interface EvaluatedLabResult {
+  readonly testId: string;
+  readonly testName: string;
+  readonly value: number;
+  readonly unit: string;
+  readonly status: LabStatus;
+  readonly referenceMin: number;
+  readonly referenceMax: number;
+  readonly isCritical: boolean;
+}
+
+export function evaluateLabValue(
+  testId: string,
+  value: number,
+  range: ReferenceRange
+): EvaluatedLabResult {
+  // Deterministic calculation logic...
+}
+```
+
+- **Rule A1**: `tsconfig.json` MUST enforce `"strict": true`, `"noImplicitAny": true`, `"noUnusedLocals": true`.
+- **Rule A2**: All data models MUST use `readonly` properties for state snapshots to prevent unintended mutations.
+
+---
 
 ### ⚛️ Rule B: Immutability & Pure Functional Engine
-- All clinical score logic in `src/engine/` and local tools in `src/agent/tools/` MUST be **pure mathematical functions** with no side effects.
+
+- **Pure Rule Engine**: Functions inside `src/engine/` MUST be **pure mathematical functions** with no side effects, DOM access, or network calls.
+- **Immutable State Updates**: State updates in `Orchestrator.ts` MUST create new state object references:
+
+```typescript
+// ✅ PRODUCTION STANDARD (Immutable State Transition)
+this.state = {
+  ...this.state,
+  currentStep: 'CHECKING_RULES',
+  node2_deterministicResults: Object.freeze(evaluatedPayload),
+};
+this.notifyListeners();
+```
+
+---
 
 ### 🛠️ Rule C: Local Tool Execution Interface
+
 - Every local tool in `src/agent/tools/` MUST implement a unified interface:
 
 ```typescript
@@ -99,8 +146,59 @@ export interface AgentTool<TParams = any, TResult = any> {
 }
 ```
 
+---
+
 ### 🔌 Rule D: Resilient Edge API Integration & Circuit Breakers
-- Network calls to Ollama (`http://localhost:11434`) MUST be wrapped in a **Circuit Breaker** pattern with an 8000ms timeout and automatic offline edge fallback simulation.
+
+- Network calls to Ollama (`http://localhost:11434`) MUST be wrapped in a **Circuit Breaker** pattern with a configurable timeout (default 8000ms).
+- If Ollama is offline or times out, the system MUST gracefully fall back to the built-in offline simulator without crashing the UI.
+
+```typescript
+// ✅ PRODUCTION STANDARD (Circuit Breaker & Fallback)
+export async function callOllamaWithFallback<T>(
+  prompt: string,
+  fallbackGenerator: () => T,
+  timeoutMs: number = 8000
+): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'gemma2', prompt, stream: false }),
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+    if (!response.ok) throw new Error(`Ollama HTTP Error: ${response.status}`);
+    const data = await response.json();
+    return JSON.parse(data.response) as T;
+  } catch (error) {
+    console.warn('[Ollama API] Connection failed or timed out. Engaging Edge Fallback Simulator.', error);
+    return fallbackGenerator();
+  }
+}
+```
+
+---
 
 ### 🎨 Rule E: ER High-Contrast UI & Accessibility (WCAG AA)
-- High-contrast tokens (`tokens.css`), dual text+color status badges, and keyboard accessibility (`Tab`, `Space`, `Enter`).
+
+In an Emergency Room, visibility under harsh fluorescent lighting is critical:
+
+- **Color Tokens (`src/styles/tokens.css`)**:
+  - `CRITICAL_HIGH`: `#DC2626` (Red 600 - High Contrast)
+  - `WARNING`: `#D97706` (Amber 600)
+  - `NORMAL`: `#059669` (Emerald 600)
+  - `BACKGROUND_DARK`: `#0F172A` (Slate 900)
+- **Accessibility Requirements**:
+  - All interactive buttons MUST have explicit `aria-label` attributes.
+  - Color BADGES must never rely on color alone—they MUST include a text status tag (e.g. `[CRITICAL HIGH]`).
+  - Keyboard navigation MUST support `Tab`, `Space`, and `Enter` keys.
+
+---
+
+### 📝 Rule F: Documentation & Inline Comments
+
+- All public functions and classes MUST feature JSDoc comments explaining parameters, return values, and clinical safety considerations.

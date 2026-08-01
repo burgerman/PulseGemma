@@ -142,7 +142,7 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
         │
         ▼
   ┌────────────┐
-  │  Step 5    │ Node 5: Gemma 4 Clinical Reasoning & Citation Engine
+  │  Step 5    │ Node 5: Gemma 4 Clinical Reasoning & Citation Agent
   │            │ • Gemma 4 synthesizes multi-source data strictly using CPG passages
   │            │ • Generates 5-Second Brief + Grounded Differentials with [Citations]
   │            │ • Invoke Local Tool: tool_generate_patient_discharge_note
@@ -180,32 +180,17 @@ A dedicated slide-over panel on the UI allows clinicians and developers to inspe
 
 ### Local Agent Tool Execution Registry (`src/agent/tools/*`)
 
-#### [NEW] [src/agent/tools/index.ts](file:///d:/Clinical%20Triage/src/agent/tools/index.ts)
-- Master Local Tool Execution Registry dispatching function calls.
+- `src/agent/tools/index.ts` (Master Local Tool Execution Registry dispatching function calls)
+- `src/agent/tools/kbQueryTool.ts` (Tool implementation for `tool_query_knowledge_base`)
+- `src/agent/tools/clinicalScoreTool.ts` (Tool implementation for `tool_calculate_clinical_score`)
+- `src/agent/tools/drugInteractionTool.ts` (Tool implementation for `tool_check_drug_interactions`)
+- `src/agent/tools/ageVitalsTool.ts` (Tool implementation for `tool_validate_age_adjusted_vitals`)
+- `src/agent/tools/patientTranslatorTool.ts` (Tool implementation for `tool_generate_patient_discharge_note`)
+- `src/agent/tools/fhirExportTool.ts` (Tool implementation for `tool_export_fhir_triage_log`)
 
-#### [NEW] [src/agent/tools/kbQueryTool.ts](file:///d:/Clinical%20Triage/src/agent/tools/kbQueryTool.ts)
-- Tool implementation for `tool_query_knowledge_base`.
-
-#### [NEW] [src/agent/tools/clinicalScoreTool.ts](file:///d:/Clinical%20Triage/src/agent/tools/clinicalScoreTool.ts)
-- Tool implementation for `tool_calculate_clinical_score` (qSOFA, Wells, TIMI).
-
-#### [NEW] [src/agent/tools/drugInteractionTool.ts](file:///d:/Clinical%20Triage/src/agent/tools/drugInteractionTool.ts)
-- Tool implementation for `tool_check_drug_interactions`.
-
-#### [NEW] [src/agent/tools/ageVitalsTool.ts](file:///d:/Clinical%20Triage/src/agent/tools/ageVitalsTool.ts)
-- Tool implementation for `tool_validate_age_adjusted_vitals`.
-
-#### [NEW] [src/agent/tools/patientTranslatorTool.ts](file:///d:/Clinical%20Triage/src/agent/tools/patientTranslatorTool.ts)
-- Tool implementation for `tool_generate_patient_discharge_note`.
-
-#### [NEW] [src/agent/tools/fhirExportTool.ts](file:///d:/Clinical%20Triage/src/agent/tools/fhirExportTool.ts)
-- Tool implementation for `tool_export_fhir_triage_log`.
-
----
-
-### Core Architecture Files
-- **`src/knowledge/index.ts`** (Unified Knowledge Base Data Layer)
-- **`src/agent/Orchestrator.ts`** (Master Workflow Coordinator)
-- **`src/agent/PipelineDebugger.ts`** (Debugger Service)
-- **`src/agent/nodes/node1_normalizer.ts`** through **`node6_safetyValidator.ts`**
-- **`src/components/WorkflowDebugger.tsx`** (UI Debugger Drawer)
+### Core Architecture Modules (`src/*`)
+- `src/knowledge/index.ts` (Unified Knowledge Base Data Layer)
+- `src/agent/Orchestrator.ts` (Master Workflow Coordinator)
+- `src/agent/PipelineDebugger.ts` (Debugger Service)
+- `src/agent/nodes/node1_normalizer.ts` through `node6_safetyValidator.ts`
+- `src/components/WorkflowDebugger.tsx` (UI Debugger Drawer)
