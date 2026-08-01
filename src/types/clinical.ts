@@ -43,6 +43,8 @@ export interface MedicalImagePayload {
   readonly base64Data?: string;
   readonly sampleUrl?: string;
   readonly timestamp: string;
+  readonly fileName?: string;
+  readonly fileSizeMb?: number;
 }
 
 export type ESILevel = 1 | 2 | 3 | 4 | 5;

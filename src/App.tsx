@@ -13,17 +13,19 @@ import { PRESET_EMERGENCY_CASES, PresetEmergencyCase } from './services/mockData
 import { createInitialState } from './agent/state';
 import { AgentOrchestrator } from './agent/Orchestrator';
 import { TriageState } from './types/agent';
-import { PatientVitals } from './types/clinical';
+import { PatientVitals, MedicalImagePayload } from './types/clinical';
 
 export function App() {
   const [selectedCase, setSelectedCase] = useState<PresetEmergencyCase>(PRESET_EMERGENCY_CASES[0]);
   const [selectedModel, setSelectedModel] = useState<string>('gemma4:vision');
+  const [activeViewTab, setActiveViewTab] = useState<'DASHBOARD' | 'INTAKE' | 'VISION' | 'EVIDENCE'>('DASHBOARD');
   
   // Interactive Patient State Inputs
   const [rawTranscript, setRawTranscript] = useState<string>(selectedCase.rawTranscript);
   const [inputLanguage, setInputLanguage] = useState<string>(selectedCase.inputLanguage);
   const [vitals, setVitals] = useState<PatientVitals>(selectedCase.vitals);
   const [rawLabs, setRawLabs] = useState<Record<string, number>>(selectedCase.rawLabs);
+  const [uploadedImage, setUploadedImage] = useState<MedicalImagePayload | undefined>(selectedCase.image);
 
   // Pipeline Orchestrator State
   const [triageState, setTriageState] = useState<TriageState>(() => 
@@ -50,6 +52,7 @@ export function App() {
     setInputLanguage(matched.inputLanguage);
     setVitals(matched.vitals);
     setRawLabs(matched.rawLabs);
+    setUploadedImage(matched.image);
 
     const newState = createInitialState(
       matched.patientProfile,
@@ -68,6 +71,11 @@ export function App() {
     setRawLabs(updatedLabs);
   };
 
+  // Upload Custom Medical Image
+  const handleUploadImage = (img: MedicalImagePayload) => {
+    setUploadedImage(img);
+  };
+
   // Run Triage Pipeline
   const handleRunTriage = async () => {
     setIsPipelineRunning(true);
@@ -77,7 +85,7 @@ export function App() {
       rawLabs,
       rawTranscript,
       inputLanguage,
-      selectedCase.image
+      uploadedImage || selectedCase.image
     );
 
     const orchestrator = new AgentOrchestrator(stateInput, selectedModel);
@@ -91,85 +99,127 @@ export function App() {
     handleRunTriage();
   }, [selectedCase]);
 
+  const activeImage = uploadedImage || selectedCase.image;
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-rose-500 selection:text-white">
       
-      {/* Header Bar */}
+      {/* Header Bar with View Switcher & Connection Badges */}
       <Header
         calculatedESI={triageState.node2_deterministicResults?.calculatedESI}
         selectedCaseId={selectedCase.id}
         selectedModel={selectedModel}
         isPipelineRunning={isPipelineRunning}
+        activeViewTab={activeViewTab}
+        hasVoiceInput={!!rawTranscript}
+        hasLabsInput={Object.keys(rawLabs).length > 0}
+        hasVisionInput={!!activeImage}
+        onChangeViewTab={setActiveViewTab}
         onSelectCase={handleSelectCase}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenDebugger={() => setIsDebuggerOpen(true)}
         onRunTriage={handleRunTriage}
       />
 
-      {/* Main Content Layout */}
+      {/* Main Content Workspace */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
         
-        {/* Deterministic Safety Banner */}
+        {/* Persistent 100% Deterministic Safety Banner */}
         <DeterministicBanner
           esiResult={triageState.node2_deterministicResults?.calculatedESI}
           labAlerts={triageState.node2_deterministicResults?.labAlerts || []}
           qSofaScore={triageState.node2_deterministicResults?.qSofaScore || 0}
         />
 
-        {/* 2-Column Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          
-          {/* Left Column: Patient Inputs, Labs & Vision (Width 7/12) */}
-          <div className="lg:col-span-7 space-y-4">
+        {/* View Tab 1: Comprehensive Dashboard (Split Column Layout) */}
+        {activeViewTab === 'DASHBOARD' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             
-            {/* Patient Profile & Voice Dictation Form */}
+            {/* Left Column: Intake, Vitals, Labs & Vision (Width 7/12) */}
+            <div className="lg:col-span-7 space-y-4">
+              
+              {/* Patient Intake & Dictation */}
+              <PatientIntakeForm
+                patientProfile={selectedCase.patientProfile}
+                vitals={vitals}
+                rawTranscript={rawTranscript}
+                inputLanguage={inputLanguage}
+                currentImage={activeImage}
+                onUpdateTranscript={setRawTranscript}
+                onUpdateLanguage={setInputLanguage}
+                onUpdateVitals={setVitals}
+                onUploadImage={handleUploadImage}
+              />
+
+              {/* Lab Panel Inspector */}
+              <LabReportInspector
+                labAlerts={triageState.node2_deterministicResults?.labAlerts || []}
+                onUpdateLabValue={handleUpdateLabValue}
+              />
+
+              {/* Gemma Vision Inspector */}
+              <VisionInspector
+                image={activeImage}
+                visionFindings={triageState.node3_visionResults?.visionFindings || []}
+              />
+
+            </div>
+
+            {/* Right Column: Grounded Decision Support Synthesis (Width 5/12) */}
+            <div className="lg:col-span-5 space-y-4">
+              
+              <GemmaDiagnosticCard
+                intakeBrief={triageState.node5_gemmaSynthesis?.fiveSecondIntakeBrief || []}
+                redFlags={triageState.node5_gemmaSynthesis?.keyRedFlags || []}
+                differentials={triageState.node5_gemmaSynthesis?.differentials || []}
+                recommendedOrders={triageState.node5_gemmaSynthesis?.recommendedOrders || []}
+                dischargeNote={triageState.node5_gemmaSynthesis?.patientDischargeNote || ''}
+                isGrounded={triageState.node6_validationState?.isGrounded ?? true}
+                onOpenEvidence={(cid) => setActiveEvidenceCitation(cid)}
+              />
+
+            </div>
+
+          </div>
+        )}
+
+        {/* View Tab 2: Guided Intake Mode (Focus on Oral & Vital Signs) */}
+        {activeViewTab === 'INTAKE' && (
+          <div className="max-w-4xl mx-auto space-y-4">
             <PatientIntakeForm
               patientProfile={selectedCase.patientProfile}
               vitals={vitals}
               rawTranscript={rawTranscript}
               inputLanguage={inputLanguage}
+              currentImage={activeImage}
               onUpdateTranscript={setRawTranscript}
               onUpdateLanguage={setInputLanguage}
               onUpdateVitals={setVitals}
+              onUploadImage={handleUploadImage}
             />
 
-            {/* Laboratory Biomarker Inspector */}
             <LabReportInspector
               labAlerts={triageState.node2_deterministicResults?.labAlerts || []}
-              rawLabs={rawLabs}
               onUpdateLabValue={handleUpdateLabValue}
             />
+          </div>
+        )}
 
-            {/* Gemma Multimodal Vision Inspector */}
+        {/* View Tab 3: Dedicated Vision Scanner Workspace */}
+        {activeViewTab === 'VISION' && (
+          <div className="max-w-4xl mx-auto space-y-4">
             <VisionInspector
-              image={selectedCase.image}
+              image={activeImage}
               visionFindings={triageState.node3_visionResults?.visionFindings || []}
             />
-
           </div>
+        )}
 
-          {/* Right Column: Grounded AI Synthesis & Decision Support (Width 5/12) */}
-          <div className="lg:col-span-5 space-y-4">
-            
-            {/* Gemma Grounded Decision Card */}
-            <GemmaDiagnosticCard
-              intakeBrief={triageState.node5_gemmaSynthesis?.fiveSecondIntakeBrief || []}
-              redFlags={triageState.node5_gemmaSynthesis?.keyRedFlags || []}
-              differentials={triageState.node5_gemmaSynthesis?.differentials || []}
-              recommendedOrders={triageState.node5_gemmaSynthesis?.recommendedOrders || []}
-              dischargeNote={triageState.node5_gemmaSynthesis?.patientDischargeNote || ''}
-              isGrounded={triageState.node6_validationState?.isGrounded ?? true}
-              onOpenEvidence={(cid) => setActiveEvidenceCitation(cid)}
-            />
-
-          </div>
-
-        </div>
       </main>
 
       {/* Footer */}
       <footer className="bg-slate-900 border-t border-slate-800 py-3 text-center text-xs text-slate-500 font-mono">
-        PulseGemma CDS Engine • Grounded Edge AI for Healthcare • 100% Offline Capable
+        PulseGemma CDS Engine • Local Edge AI for Healthcare • 100% Deterministic Safety Rules
       </footer>
 
       {/* Evidence Viewer Modal */}
