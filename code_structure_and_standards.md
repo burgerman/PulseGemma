@@ -1,7 +1,7 @@
 # 📐 PulseGemma: Production-Grade Code Structure & Coding Standards
-### Architecture Blueprint & Developer Engineering Guidelines
+### Architecture Blueprint & Developer Engineering Guidelines (Gemma 4 12B)
 
-> **"Production-ready TypeScript & React architecture for clinical-grade edge applications: zero implicit type casting, local tool execution registry, pure deterministic functions, circuit-breaker resilience, and WCAG AA accessible UI design."**
+> **"Production-ready TypeScript & React architecture for clinical-grade edge applications powered by Ollama Gemma 4 12B: zero implicit type casting, local tool execution registry, pure deterministic functions, circuit-breaker resilience, and WCAG AA accessible UI design."**
 
 ---
 
@@ -13,7 +13,7 @@ PulseGemma/
 ├── package.json                         # Dependencies & npm scripts
 ├── tsconfig.json                        # Strict TypeScript configuration
 ├── vite.config.ts                       # Vite bundler config with path aliases (@/*)
-├── README.md                            # Executive overview & project blueprint
+├── README.md                            # Executive overview & project blueprint (Gemma 4 12B)
 ├── agent_orchestrator_plan.md           # 6-Node agentic pipeline & tool execution specification
 ├── code_structure_and_standards.md      # Production coding standards (THIS FILE)
 │
@@ -39,7 +39,7 @@ PulseGemma/
     │   ├── esiCalculator.ts             # ESI v4 decision tree evaluator
     │   └── riskScoreCalculator.ts       # qSOFA, Wells PE, & TIMI ACS scoring
     │
-    ├── agent/                           # Multi-Agent Orchestrator Pipeline
+    ├── agent/                           # Multi-Agent Orchestrator Pipeline (Gemma 4 12B)
     │   ├── Orchestrator.ts              # Master pipeline coordinator (State Machine)
     │   ├── PipelineDebugger.ts          # Debugger service & trace logger
     │   ├── state.ts                     # State factory & mutation helpers
@@ -54,13 +54,13 @@ PulseGemma/
     │   └── nodes/                       # Pipeline Execution Nodes
     │       ├── node1_normalizer.ts      # Multilingual Translation & NLU Node
     │       ├── node2_deterministicRules.ts# Deterministic Safety Check Node
-    │       ├── node3_visionAgent.ts     # Gemma Vision OCR & Radiologic Feature Node
+    │       ├── node3_visionAgent.ts     # Gemma 4 Vision OCR & Radiologic Feature Node
     │       ├── node4_ragRetrieval.ts    # Ground-Truth RAG Retrieval Node
-    │       ├── node5_gemmaReasoner.ts   # Gemma 4 Clinical Reasoning Node
+    │       ├── node5_gemmaReasoner.ts   # Gemma 4 12B Clinical Reasoning Node
     │       └── node6_safetyValidator.ts # AST Grounding Safety Guardrail Node
     │
     ├── services/                        # Edge AI & Speech Integration
-    │   ├── ollamaService.ts             # Ollama REST API client + Circuit Breaker
+    │   ├── ollamaService.ts             # Ollama REST API client (`gemma4:12b`) + Circuit Breaker
     │   ├── webSpeechService.ts          # Browser Web Speech API wrapper
     │   └── mockDataService.ts           # Pre-loaded ER Emergency Test Cases
     │
@@ -83,12 +83,6 @@ PulseGemma/
 ### 🛡️ Rule A: Strict Type Safety (No `any`, No Implicit Casting)
 
 ```typescript
-// ❌ UNACCEPTABLE (Weak, unsafe code)
-function processLab(data: any) {
-  return data.val > 0.04 ? "CRITICAL" : "OK";
-}
-
-// ✅ PRODUCTION STANDARD (Strict types, explicit contracts)
 export type LabStatus = 'CRITICAL_HIGH' | 'CRITICAL_LOW' | 'ABNORMAL_HIGH' | 'ABNORMAL_LOW' | 'NORMAL';
 
 export interface EvaluatedLabResult {
@@ -101,61 +95,21 @@ export interface EvaluatedLabResult {
   readonly referenceMax: number;
   readonly isCritical: boolean;
 }
-
-export function evaluateLabValue(
-  testId: string,
-  value: number,
-  range: ReferenceRange
-): EvaluatedLabResult {
-  // Deterministic calculation logic...
-}
 ```
 
 - **Rule A1**: `tsconfig.json` MUST enforce `"strict": true`, `"noImplicitAny": true`, `"noUnusedLocals": true`.
-- **Rule A2**: All data models MUST use `readonly` properties for state snapshots to prevent unintended mutations.
+- **Rule A2**: All data models MUST use `readonly` properties for state snapshots.
 
 ---
 
-### ⚛️ Rule B: Immutability & Pure Functional Engine
+### 🔌 Rule B: Resilient Edge API Integration & Circuit Breakers (Gemma 4 12B)
 
-- **Pure Rule Engine**: Functions inside `src/engine/` MUST be **pure mathematical functions** with no side effects, DOM access, or network calls.
-- **Immutable State Updates**: State updates in `Orchestrator.ts` MUST create new state object references:
-
-```typescript
-// ✅ PRODUCTION STANDARD (Immutable State Transition)
-this.state = {
-  ...this.state,
-  currentStep: 'CHECKING_RULES',
-  node2_deterministicResults: Object.freeze(evaluatedPayload),
-};
-this.notifyListeners();
-```
-
----
-
-### 🛠️ Rule C: Local Tool Execution Interface
-
-- Every local tool in `src/agent/tools/` MUST implement a unified interface:
-
-```typescript
-export interface AgentTool<TParams = any, TResult = any> {
-  readonly name: string;
-  readonly description: string;
-  readonly schema: Record<string, unknown>;
-  execute(params: TParams): Promise<TResult> | TResult;
-}
-```
-
----
-
-### 🔌 Rule D: Resilient Edge API Integration & Circuit Breakers
-
-- Network calls to Ollama (`http://localhost:11434`) MUST be wrapped in a **Circuit Breaker** pattern with a configurable timeout (default 8000ms).
+- Network calls to Ollama (`http://localhost:11434`) targeting `gemma4:12b` MUST be wrapped in a **Circuit Breaker** pattern with an 8000ms timeout.
 - If Ollama is offline or times out, the system MUST gracefully fall back to the built-in offline simulator without crashing the UI.
 
 ```typescript
-// ✅ PRODUCTION STANDARD (Circuit Breaker & Fallback)
-export async function callOllamaWithFallback<T>(
+// ✅ PRODUCTION STANDARD (Circuit Breaker & Fallback for Gemma 4 12B)
+export async function callOllamaGemma4<T>(
   prompt: string,
   fallbackGenerator: () => T,
   timeoutMs: number = 8000
@@ -167,7 +121,7 @@ export async function callOllamaWithFallback<T>(
     const response = await fetch('http://localhost:11434/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'gemma2', prompt, stream: false }),
+      body: JSON.stringify({ model: 'gemma4:12b', prompt, stream: false }),
       signal: controller.signal
     });
     clearTimeout(timer);
@@ -175,7 +129,7 @@ export async function callOllamaWithFallback<T>(
     const data = await response.json();
     return JSON.parse(data.response) as T;
   } catch (error) {
-    console.warn('[Ollama API] Connection failed or timed out. Engaging Edge Fallback Simulator.', error);
+    console.warn('[Ollama Gemma 4 12B API] Connection failed or timed out. Engaging Edge Fallback Simulator.', error);
     return fallbackGenerator();
   }
 }
@@ -183,9 +137,7 @@ export async function callOllamaWithFallback<T>(
 
 ---
 
-### 🎨 Rule E: ER High-Contrast UI & Accessibility (WCAG AA)
-
-In an Emergency Room, visibility under harsh fluorescent lighting is critical:
+### 🎨 Rule C: ER High-Contrast UI & Accessibility (WCAG AA)
 
 - **Color Tokens (`src/styles/tokens.css`)**:
   - `CRITICAL_HIGH`: `#DC2626` (Red 600 - High Contrast)
@@ -196,9 +148,3 @@ In an Emergency Room, visibility under harsh fluorescent lighting is critical:
   - All interactive buttons MUST have explicit `aria-label` attributes.
   - Color BADGES must never rely on color alone—they MUST include a text status tag (e.g. `[CRITICAL HIGH]`).
   - Keyboard navigation MUST support `Tab`, `Space`, and `Enter` keys.
-
----
-
-### 📝 Rule F: Documentation & Inline Comments
-
-- All public functions and classes MUST feature JSDoc comments explaining parameters, return values, and clinical safety considerations.

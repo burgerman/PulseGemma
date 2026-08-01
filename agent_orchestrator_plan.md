@@ -1,17 +1,17 @@
 # 🤖 Local Agentic Orchestrator & Workflow Implementation Plan
-### PulseGemma: Grounded Edge-AI Clinical Triage Engine
+### PulseGemma: Grounded Edge-AI Clinical Triage Engine (Gemma 4 12B)
 
-> **"A multi-agent, event-driven local orchestration pipeline powered by a Local Tool Calling Execution Layer and a Unified Knowledge Base Data Layer, combining Gemma 4's advanced reasoning with 100% grounded deterministic safety controls."**
+> **"A multi-agent, event-driven local orchestration pipeline powered by a Local Tool Calling Execution Layer and a Unified Knowledge Base Data Layer, combining Ollama Gemma 4 12B's advanced reasoning with 100% grounded deterministic safety controls."**
 
 ---
 
 ## 🛠️ 1. Local Tool Calling Execution Layer (`src/agent/tools/*`)
 
-To make the agentic workflow robust, smart, and extensible, **PulseGemma** equips Gemma 4 and the sub-agent nodes with a suite of **Local Executable Tools**. Instead of relying on parametric memory or guessing, Gemma 4 calls local client-side tool functions deterministically.
+To make the agentic workflow robust, smart, and extensible, **PulseGemma** equips **Gemma 4 12B** and the sub-agent nodes with a suite of **Local Executable Tools**. Instead of relying on parametric memory or guessing, Gemma 4 12B calls local client-side tool functions deterministically.
 
 ```
                               ┌────────────────────────────────────────────────────────┐
-                              │           GEMMA 4 REASONING & AGENT NODES              │
+                              │         GEMMA 4 12B REASONING & AGENT NODES            │
                               └───────────────────────────┬────────────────────────────┘
                                                           │
                                                           ▼ (Function Calling / Tool Execution)
@@ -49,13 +49,13 @@ To make the agentic workflow robust, smart, and extensible, **PulseGemma** equip
 
 ---
 
-## 🧠 2. Leveraging Gemma 4's Advanced Reasoning & Tool Calling
+## 🧠 2. Leveraging Gemma 4 12B Advanced Reasoning & Tool Calling
 
-PulseGemma maximizes **Gemma 4's high-level reasoning, complex natural language understanding (NLU), and tool calling capabilities** while enforcing strict grounding over the `UnifiedKnowledgeBase`:
+PulseGemma maximizes **Gemma 4 12B's high-level reasoning, complex natural language understanding (NLU), and tool calling capabilities** while enforcing strict grounding over the `UnifiedKnowledgeBase`:
 
 ```
                        ┌────────────────────────────────────────────────────────┐
-                       │          GEMMA 4 ADVANCED REASONING ENGINES            │
+                       │        GEMMA 4 12B ADVANCED REASONING ENGINES          │
                        └───────────────────────────┬────────────────────────────┘
                                                    │
          ┌─────────────────────────────────────────┼─────────────────────────────────────────┐
@@ -112,9 +112,9 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
         │
         ▼
   ┌────────────┐
-  │  Step 1    │ Node 1: Multilingual Gemma 4 Normalization
+  │  Step 1    │ Node 1: Multilingual Gemma 4 12B Normalization
   │            │ • Interpret language (e.g. 'es') -> Translate to English
-  │            │ • Gemma 4 maps colloquial phrases to SNOMED clinical concepts
+  │            │ • Gemma 4 12B maps colloquial phrases to SNOMED clinical concepts
   └─────┬──────┘
         │
         ▼
@@ -128,8 +128,8 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
         │
         ▼
   ┌────────────┐
-  │  Step 3    │ Node 3: Gemma Vision OCR & Radiologic Feature Agent
-  │            │ • If medical image present -> Call Ollama Vision API
+  │  Step 3    │ Node 3: Gemma 4 Vision OCR & Radiologic Feature Agent
+  │            │ • If medical image present -> Call Ollama Vision API (gemma4:12b / llava)
   │            │ • Extract paper lab sheet values & X-Ray visual findings
   └─────┬──────┘
         │
@@ -142,8 +142,8 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
         │
         ▼
   ┌────────────┐
-  │  Step 5    │ Node 5: Gemma 4 Clinical Reasoning & Citation Agent
-  │            │ • Gemma 4 synthesizes multi-source data strictly using CPG passages
+  │  Step 5    │ Node 5: Gemma 4 12B Clinical Reasoning & Citation Engine
+  │            │ • Gemma 4 12B synthesizes multi-source data strictly using CPG passages
   │            │ • Generates 5-Second Brief + Grounded Differentials with [Citations]
   │            │ • Invoke Local Tool: tool_generate_patient_discharge_note
   └─────┬──────┘
@@ -166,31 +166,24 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
 
 ## 🛠️ 5. Workflow Debugging & Audit Architecture
 
-To enable total transparency, review, and step-by-step debugging, the orchestrator includes a dedicated **`PipelineDebugger`** service:
-
-### 1. Execution Trace Logging (`PipelineTraceLog`)
-Every execution run produces a detailed debug trace capturing timestamped inputs, outputs, tool execution calls, and latencies for each node.
-
-### 2. Interactive UI Workflow Debugger Panel (`WorkflowDebugger.tsx`)
-A dedicated slide-over panel on the UI allows clinicians and developers to inspect intermediate state snapshots, tool call arguments, and citation maps across all 6 steps.
+To enable total transparency, review, and step-by-step debugging, the orchestrator includes a dedicated **`PipelineDebugger`** service storing timestamped execution trace logs for every node.
 
 ---
 
 ## 📁 6. File-by-File Implementation Checklist
 
 ### Local Agent Tool Execution Registry (`src/agent/tools/*`)
-
-- `src/agent/tools/index.ts` (Master Local Tool Execution Registry dispatching function calls)
-- `src/agent/tools/kbQueryTool.ts` (Tool implementation for `tool_query_knowledge_base`)
-- `src/agent/tools/clinicalScoreTool.ts` (Tool implementation for `tool_calculate_clinical_score`)
-- `src/agent/tools/drugInteractionTool.ts` (Tool implementation for `tool_check_drug_interactions`)
-- `src/agent/tools/ageVitalsTool.ts` (Tool implementation for `tool_validate_age_adjusted_vitals`)
-- `src/agent/tools/patientTranslatorTool.ts` (Tool implementation for `tool_generate_patient_discharge_note`)
-- `src/agent/tools/fhirExportTool.ts` (Tool implementation for `tool_export_fhir_triage_log`)
+- `src/agent/tools/index.ts` (Master Tool Execution Registry dispatching function calls)
+- `src/agent/tools/kbQueryTool.ts` (`tool_query_knowledge_base`)
+- `src/agent/tools/clinicalScoreTool.ts` (`tool_calculate_clinical_score`)
+- `src/agent/tools/drugInteractionTool.ts` (`tool_check_drug_interactions`)
+- `src/agent/tools/ageVitalsTool.ts` (`tool_validate_age_adjusted_vitals`)
+- `src/agent/tools/patientTranslatorTool.ts` (`tool_generate_patient_discharge_note`)
+- `src/agent/tools/fhirExportTool.ts` (`tool_export_fhir_triage_log`)
 
 ### Core Architecture Modules (`src/*`)
 - `src/knowledge/index.ts` (Unified Knowledge Base Data Layer)
-- `src/agent/Orchestrator.ts` (Master Workflow Coordinator)
+- `src/agent/Orchestrator.ts` (Master Workflow Coordinator executing Gemma 4 12B pipeline)
 - `src/agent/PipelineDebugger.ts` (Debugger Service)
 - `src/agent/nodes/node1_normalizer.ts` through `node6_safetyValidator.ts`
 - `src/components/WorkflowDebugger.tsx` (UI Debugger Drawer)
