@@ -1,4 +1,5 @@
 import { PatientProfile, PatientVitals, MedicalImagePayload } from '../types/clinical';
+import { SAMPLE_ECG_STEMI_IMAGE, SAMPLE_CHEST_XRAY_IMAGE, SAMPLE_LAB_SHEET_IMAGE } from './sampleImages';
 
 export interface PresetEmergencyCase {
   readonly id: string;
@@ -16,9 +17,9 @@ export interface PresetEmergencyCase {
 export const PRESET_EMERGENCY_CASES: PresetEmergencyCase[] = [
   {
     id: 'CASE_1_ACS_CHEST_PAIN',
-    title: 'Acute Coronary Syndrome (ACS) / Chest Pain',
+    title: '🫀 ACS Chest Pain (STEMI)',
     categoryBadge: 'ESI LEVEL 2 - HIGH RISK',
-    description: '58yo male with crushing substernal chest pressure radiating to left arm and elevated Cardiac Troponin I.',
+    description: '58yo male with crushing substernal chest pressure radiating to left arm and elevated Cardiac Troponin I (0.85 ng/mL).',
     patientProfile: {
       id: 'PATIENT_101',
       name: 'Robert Vance',
@@ -47,20 +48,21 @@ export const PRESET_EMERGENCY_CASES: PresetEmergencyCase[] = [
       GLUCOSE: 142,
       WBC: 9.8
     },
-    rawTranscript: 'I started having this heavy crushing weight on my chest about 2 hours ago. It radiates down my left arm and I feel really sweaty and lightheaded.',
-    inputLanguage: 'en',
+    rawTranscript: 'Tengo un dolor muy fuerte en el pecho que se me va al brazo izquierdo y me siento mareado desde hace dos horas.',
+    inputLanguage: 'es',
     image: {
       id: 'IMG_ECG_STEMI',
       title: '12-Lead ECG Strip (Anterior STEMI)',
       category: 'ECG_STRIP',
+      base64Data: SAMPLE_ECG_STEMI_IMAGE,
       timestamp: new Date().toISOString()
     }
   },
   {
     id: 'CASE_2_SEVERE_SEPSIS',
-    title: 'Severe Sepsis / Septic Shock',
+    title: '🔥 Severe Sepsis / Septic Shock',
     categoryBadge: 'ESI LEVEL 1 - CRITICAL',
-    description: '67yo female with high fever, severe dyspnea, elevated blood lactate (4.2 mmol/L), and low blood pressure.',
+    description: '67yo female with high fever (39.4°C), severe dyspnea, elevated blood lactate (4.2 mmol/L), and hypotension (BP 88/54).',
     patientProfile: {
       id: 'PATIENT_102',
       name: 'Elena Rostova',
@@ -88,20 +90,21 @@ export const PRESET_EMERGENCY_CASES: PresetEmergencyCase[] = [
       HCO3: 16,
       POTASSIUM: 5.8
     },
-    rawTranscript: 'Tengo mucha fiebre y no puedo respirar bien desde la mañana. Me siento muy débil y confundida.',
-    inputLanguage: 'es',
+    rawTranscript: '发高烧39.5度，呼吸非常困难，头晕发冷，今天早上起来完全没力气。',
+    inputLanguage: 'zh',
     image: {
       id: 'IMG_XRAY_PNEUMONIA',
-      title: 'Chest X-Ray (Right Lower Lobe Opacity)',
+      title: 'Chest X-Ray (Right Lower Lobe Consolidation)',
       category: 'XRAY',
+      base64Data: SAMPLE_CHEST_XRAY_IMAGE,
       timestamp: new Date().toISOString()
     }
   },
   {
     id: 'CASE_3_HYPERKALEMIA',
-    title: 'Severe Acute Hyperkalemia',
+    title: '⚡ Acute ESRD Hyperkalemia',
     categoryBadge: 'ESI LEVEL 2 - CRITICAL LAB',
-    description: '62yo male with end-stage renal disease presenting with muscle weakness and critical Serum Potassium (K+ = 6.8 mEq/L).',
+    description: '62yo male with end-stage renal disease presenting with muscle weakness and panic Serum Potassium (K+ = 6.8 mEq/L).',
     patientProfile: {
       id: 'PATIENT_103',
       name: 'Marcus Chen',
@@ -129,20 +132,21 @@ export const PRESET_EMERGENCY_CASES: PresetEmergencyCase[] = [
       GLUCOSE: 210,
       TROPONIN_I: 0.02
     },
-    rawTranscript: '感觉全身上下都没力气，尤其是两条腿发麻。今天早上没能去做血液透析。',
-    inputLanguage: 'zh',
+    rawTranscript: 'Je me sens tres faible et mes jambes sont engourdies depuis ce matin.',
+    inputLanguage: 'fr',
     image: {
       id: 'IMG_LAB_PRINT',
       title: 'Printed Lab Report Photo (Critical K+ Alert)',
       category: 'LAB_SHEET_PHOTO',
+      base64Data: SAMPLE_LAB_SHEET_IMAGE,
       timestamp: new Date().toISOString()
     }
   },
   {
     id: 'CASE_4_DKA',
-    title: 'Diabetic Ketoacidosis (DKA)',
+    title: '🩸 Diabetic Ketoacidosis (DKA)',
     categoryBadge: 'ESI LEVEL 2 - METABOLIC',
-    description: '24yo female with Type 1 Diabetes, severe abdominal pain, nausea, blood glucose 380 mg/dL, and pH 7.22.',
+    description: '24yo female with Type 1 Diabetes, severe cramping abdominal pain, blood glucose 380 mg/dL, and pH 7.22.',
     patientProfile: {
       id: 'PATIENT_104',
       name: 'Chloe Miller',
@@ -170,7 +174,14 @@ export const PRESET_EMERGENCY_CASES: PresetEmergencyCase[] = [
       SODIUM: 134,
       LACTATE: 2.1
     },
-    rawTranscript: 'I have intense cramping stomach pain and I keep throwing up. My blood sugar sensor is reading HI and I ran out of insulin cartridges yesterday.',
-    inputLanguage: 'en'
+    rawTranscript: 'Severe cramping stomach pain, vomiting repeatedly, blood sugar reading HI after running out of insulin.',
+    inputLanguage: 'en',
+    image: {
+      id: 'IMG_ECG_DKA',
+      title: '12-Lead ECG Strip (Sinus Tachycardia)',
+      category: 'ECG_STRIP',
+      base64Data: SAMPLE_ECG_STEMI_IMAGE,
+      timestamp: new Date().toISOString()
+    }
   }
 ];
