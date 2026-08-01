@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Header, FeatureTabKey } from './components/Header';
+import { Header, FeatureTabKey, ViewLayoutMode } from './components/Header';
 import { VoiceDictationTab } from './components/tabs/VoiceDictationTab';
 import { DeterministicLabTab } from './components/tabs/DeterministicLabTab';
 import { MultimodalVisionTab } from './components/tabs/MultimodalVisionTab';
@@ -20,7 +20,17 @@ export function App() {
   const [selectedCase, setSelectedCase] = useState<PresetEmergencyCase>(PRESET_EMERGENCY_CASES[0]);
   const [selectedModel, setSelectedModel] = useState<string>('gemma4:vision');
   const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabKey>('VOICE_DICTATION');
+  const [layoutMode, setLayoutMode] = useState<ViewLayoutMode>('MODULAR_GRID');
   
+  // Modular Module Visibility Map
+  const [visibleModules, setVisibleModules] = useState<Record<FeatureTabKey, boolean>>({
+    VOICE_DICTATION: true,
+    DETERMINISTIC_LABS: true,
+    MULTIMODAL_VISION: true,
+    GROUNDED_RAG: true,
+    TRIAGE_SYNTHESIS: true
+  });
+
   // Interactive Patient State Inputs
   const [rawTranscript, setRawTranscript] = useState<string>(selectedCase.rawTranscript);
   const [inputLanguage, setInputLanguage] = useState<string>(selectedCase.inputLanguage);
@@ -66,6 +76,14 @@ export function App() {
     setTriageState(newState);
   };
 
+  // Toggle Module Visibility
+  const handleToggleModuleVisibility = (key: FeatureTabKey) => {
+    setVisibleModules(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
   // Update Lab Value
   const handleUpdateLabValue = (testId: string, val: number) => {
     const updatedLabs = { ...rawLabs, [testId]: val };
@@ -105,85 +123,171 @@ export function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-rose-500 selection:text-white font-sans">
       
-      {/* Header with Independent Feature Tabs */}
+      {/* Header Bar */}
       <Header
         calculatedESI={triageState.node2_deterministicResults?.calculatedESI}
         selectedCaseId={selectedCase.id}
         selectedModel={selectedModel}
         isPipelineRunning={isPipelineRunning}
         activeFeatureTab={activeFeatureTab}
+        layoutMode={layoutMode}
+        visibleModules={visibleModules}
         onSelectFeatureTab={setActiveFeatureTab}
+        onChangeLayoutMode={setLayoutMode}
+        onToggleModuleVisibility={handleToggleModuleVisibility}
         onSelectCase={handleSelectCase}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenDebugger={() => setIsDebuggerOpen(true)}
         onRunTriage={handleRunTriage}
       />
 
-      {/* Main Single-Responsibility Feature Tab Content */}
+      {/* Main Workspace Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
         
-        {/* Tab 1: Hands-Free Voice Dictation & Multilingual NLU */}
-        {activeFeatureTab === 'VOICE_DICTATION' && (
-          <VoiceDictationTab
-            patientProfile={selectedCase.patientProfile}
-            rawTranscript={rawTranscript}
-            inputLanguage={inputLanguage}
-            normalizedSymptoms={triageState.node1_normalizedSymptoms}
-            onUpdateTranscript={setRawTranscript}
-            onUpdateLanguage={setInputLanguage}
-          />
-        )}
+        {/* MODULAR GRID MODE: All Active Feature Modules Arranged in Grid Cards */}
+        {layoutMode === 'MODULAR_GRID' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Left Column: Intake, Range Checker & Vision (Width 7/12) */}
+            <div className="lg:col-span-7 space-y-6">
+              
+              {/* Module 1: Voice Dictation */}
+              {visibleModules.VOICE_DICTATION && (
+                <div className="relative">
+                  <VoiceDictationTab
+                    patientProfile={selectedCase.patientProfile}
+                    rawTranscript={rawTranscript}
+                    inputLanguage={inputLanguage}
+                    normalizedSymptoms={triageState.node1_normalizedSymptoms}
+                    onUpdateTranscript={setRawTranscript}
+                    onUpdateLanguage={setInputLanguage}
+                  />
+                </div>
+              )}
 
-        {/* Tab 2: Deterministic Range Checker & Safety Engine */}
-        {activeFeatureTab === 'DETERMINISTIC_LABS' && (
-          <DeterministicLabTab
-            vitals={vitals}
-            labAlerts={triageState.node2_deterministicResults?.labAlerts || []}
-            esiResult={triageState.node2_deterministicResults?.calculatedESI}
-            qSofaScore={triageState.node2_deterministicResults?.qSofaScore || 0}
-            wellsScore={triageState.node2_deterministicResults?.wellsScore || 0}
-            drugAlerts={triageState.node2_deterministicResults?.drugInteractionAlerts || []}
-            onUpdateVitals={setVitals}
-            onUpdateLabValue={handleUpdateLabValue}
-          />
-        )}
+              {/* Module 2: Range Checker */}
+              {visibleModules.DETERMINISTIC_LABS && (
+                <div className="relative">
+                  <DeterministicLabTab
+                    vitals={vitals}
+                    labAlerts={triageState.node2_deterministicResults?.labAlerts || []}
+                    esiResult={triageState.node2_deterministicResults?.calculatedESI}
+                    qSofaScore={triageState.node2_deterministicResults?.qSofaScore || 0}
+                    wellsScore={triageState.node2_deterministicResults?.wellsScore || 0}
+                    drugAlerts={triageState.node2_deterministicResults?.drugInteractionAlerts || []}
+                    onUpdateVitals={setVitals}
+                    onUpdateLabValue={handleUpdateLabValue}
+                  />
+                </div>
+              )}
 
-        {/* Tab 3: Multimodal Vision Scanner */}
-        {activeFeatureTab === 'MULTIMODAL_VISION' && (
-          <MultimodalVisionTab
-            image={activeImage}
-            visionFindings={triageState.node3_visionResults?.visionFindings || []}
-            onUploadImage={handleUploadImage}
-          />
-        )}
+              {/* Module 3: Multimodal Vision */}
+              {visibleModules.MULTIMODAL_VISION && (
+                <div className="relative">
+                  <MultimodalVisionTab
+                    image={activeImage}
+                    visionFindings={triageState.node3_visionResults?.visionFindings || []}
+                    onUploadImage={handleUploadImage}
+                  />
+                </div>
+              )}
 
-        {/* Tab 4: Grounded CPG RAG & Evidence Engine */}
-        {activeFeatureTab === 'GROUNDED_RAG' && (
-          <GroundedRAGTab
-            retrievedGuidelines={triageState.node4_retrievedGuidelines || []}
-            onOpenEvidenceModal={(cid) => setActiveEvidenceCitation(cid)}
-          />
-        )}
+            </div>
 
-        {/* Tab 5: Master Triage Brief & EHR Export */}
-        {activeFeatureTab === 'TRIAGE_SYNTHESIS' && (
-          <MasterTriageSynthesisTab
-            intakeBrief={triageState.node5_gemmaSynthesis?.fiveSecondIntakeBrief || []}
-            redFlags={triageState.node5_gemmaSynthesis?.keyRedFlags || []}
-            differentials={triageState.node5_gemmaSynthesis?.differentials || []}
-            recommendedOrders={triageState.node5_gemmaSynthesis?.recommendedOrders || []}
-            dischargeNote={triageState.node5_gemmaSynthesis?.patientDischargeNote || ''}
-            isGrounded={triageState.node6_validationState?.isGrounded ?? true}
-            esiResult={triageState.node2_deterministicResults?.calculatedESI}
-            onOpenEvidence={(cid) => setActiveEvidenceCitation(cid)}
-          />
+            {/* Right Column: Grounded RAG & Master Triage Brief (Width 5/12) */}
+            <div className="lg:col-span-5 space-y-6">
+              
+              {/* Module 5: Master Triage Brief */}
+              {visibleModules.TRIAGE_SYNTHESIS && (
+                <div className="relative">
+                  <MasterTriageSynthesisTab
+                    intakeBrief={triageState.node5_gemmaSynthesis?.fiveSecondIntakeBrief || []}
+                    redFlags={triageState.node5_gemmaSynthesis?.keyRedFlags || []}
+                    differentials={triageState.node5_gemmaSynthesis?.differentials || []}
+                    recommendedOrders={triageState.node5_gemmaSynthesis?.recommendedOrders || []}
+                    dischargeNote={triageState.node5_gemmaSynthesis?.patientDischargeNote || ''}
+                    isGrounded={triageState.node6_validationState?.isGrounded ?? true}
+                    esiResult={triageState.node2_deterministicResults?.calculatedESI}
+                    onOpenEvidence={(cid) => setActiveEvidenceCitation(cid)}
+                  />
+                </div>
+              )}
+
+              {/* Module 4: Grounded RAG */}
+              {visibleModules.GROUNDED_RAG && (
+                <div className="relative">
+                  <GroundedRAGTab
+                    retrievedGuidelines={triageState.node4_retrievedGuidelines || []}
+                    onOpenEvidenceModal={(cid) => setActiveEvidenceCitation(cid)}
+                  />
+                </div>
+              )}
+
+            </div>
+
+          </div>
+        ) : (
+          /* SINGLE FOCUS MODE: View 1 Isolated Feature Tab */
+          <div>
+            {activeFeatureTab === 'VOICE_DICTATION' && (
+              <VoiceDictationTab
+                patientProfile={selectedCase.patientProfile}
+                rawTranscript={rawTranscript}
+                inputLanguage={inputLanguage}
+                normalizedSymptoms={triageState.node1_normalizedSymptoms}
+                onUpdateTranscript={setRawTranscript}
+                onUpdateLanguage={setInputLanguage}
+              />
+            )}
+
+            {activeFeatureTab === 'DETERMINISTIC_LABS' && (
+              <DeterministicLabTab
+                vitals={vitals}
+                labAlerts={triageState.node2_deterministicResults?.labAlerts || []}
+                esiResult={triageState.node2_deterministicResults?.calculatedESI}
+                qSofaScore={triageState.node2_deterministicResults?.qSofaScore || 0}
+                wellsScore={triageState.node2_deterministicResults?.wellsScore || 0}
+                drugAlerts={triageState.node2_deterministicResults?.drugInteractionAlerts || []}
+                onUpdateVitals={setVitals}
+                onUpdateLabValue={handleUpdateLabValue}
+              />
+            )}
+
+            {activeFeatureTab === 'MULTIMODAL_VISION' && (
+              <MultimodalVisionTab
+                image={activeImage}
+                visionFindings={triageState.node3_visionResults?.visionFindings || []}
+                onUploadImage={handleUploadImage}
+              />
+            )}
+
+            {activeFeatureTab === 'GROUNDED_RAG' && (
+              <GroundedRAGTab
+                retrievedGuidelines={triageState.node4_retrievedGuidelines || []}
+                onOpenEvidenceModal={(cid) => setActiveEvidenceCitation(cid)}
+              />
+            )}
+
+            {activeFeatureTab === 'TRIAGE_SYNTHESIS' && (
+              <MasterTriageSynthesisTab
+                intakeBrief={triageState.node5_gemmaSynthesis?.fiveSecondIntakeBrief || []}
+                redFlags={triageState.node5_gemmaSynthesis?.keyRedFlags || []}
+                differentials={triageState.node5_gemmaSynthesis?.differentials || []}
+                recommendedOrders={triageState.node5_gemmaSynthesis?.recommendedOrders || []}
+                dischargeNote={triageState.node5_gemmaSynthesis?.patientDischargeNote || ''}
+                isGrounded={triageState.node6_validationState?.isGrounded ?? true}
+                esiResult={triageState.node2_deterministicResults?.calculatedESI}
+                onOpenEvidence={(cid) => setActiveEvidenceCitation(cid)}
+              />
+            )}
+          </div>
         )}
 
       </main>
 
       {/* Footer */}
       <footer className="bg-slate-900 border-t border-slate-800 py-3 text-center text-xs text-slate-500 font-mono">
-        PulseGemma CDS Engine • Component-Oriented Single Responsibility Architecture • 100% Offline Capable
+        PulseGemma CDS Engine • Modular UI Architecture • 100% Offline Capable
       </footer>
 
       {/* Evidence Viewer Modal */}
