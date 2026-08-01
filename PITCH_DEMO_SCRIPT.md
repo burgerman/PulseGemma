@@ -1,19 +1,68 @@
-# 🏆 PulseGemma: 3-Minute Hackathon Pitch & Live Demo Script
+# 🏆 PulseGemma: Complete Pitch & System Workflow Demo Script
 
 > **"Sub-second patient history synthesis, 100% deterministic safety rules, multimodal vision scanning, hands-free voice dictation, and multilingual clinical translation—powered by local Multimodal Vision AI models on the edge."**
 
 ---
 
-## ⏱️ Timeline & Pitch Overview (Total Time: 3:00)
+## 🏛️ System Overview & 6-Node Agentic Workflow Architecture
+
+```
+                  ┌─────────────────────────────────────────────────┐
+                  │                 PATIENT INPUTS                  │
+                  │ (Voice Audio / Vitals / Labs / X-Rays / ECGs)   │
+                  └────────────────────────┬────────────────────────┘
+                                           │
+                                           ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 1. Multilingual NLU & Symptom Normalizer Node                          │
+ │    • Translates 20+ languages -> Maps colloquial phrases to SNOMED.   │
+ └──────────────────────────────────┬─────────────────────────────────────┘
+                                    │
+                                    ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 2. 100% Deterministic Safety & Rule Engine Node (0ms TypeScript)       │
+ │    • Evaluates panic lab limits & ESI v4 decision tree (Levels 1 - 5).  │
+ │    • Executes Local Tools: qSOFA, Wells PE, Drug Interaction Checks.   │
+ └──────────────────────────────────┬─────────────────────────────────────┘
+                                    │
+                                    ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 3. Gemma Multimodal Vision & Image OCR Scanner Node                    │
+ │    • Parses image tensors (Chest X-Rays, 12-lead ECGs, paper lab sheet)│
+ └──────────────────────────────────┬─────────────────────────────────────┘
+                                    │
+                                    ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 4. Ground-Truth RAG Guideline Retrieval Node                           │
+ │    • Fetches verbatim CPG passages (AHA 2023, Surviving Sepsis 2021).  │
+ └──────────────────────────────────┬─────────────────────────────────────┘
+                                    │
+                                    ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 5. Gemma Multimodal Clinical Reasoning Node                            │
+ │    • Synthesizes 5-Second Brief & Grounded Differentials [Citations].  │
+ └──────────────────────────────────┬─────────────────────────────────────┘
+                                    │
+                                    ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 6. AST Grounding Safety Guardrail & EHR Export Node                    │
+ │    • Audits citations -> Exports HL7/FHIR compliant triage audit log.  │
+ └────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## ⏱️ Pitch Timeline (Total Time: ~3:30)
 
 | Phase | Time | Goal | Action in App |
 | :--- | :---: | :--- | :--- |
-| **1. The Problem & Hook** | 0:00 - 0:35 | Frame real-world ER triage bottlenecks, language barriers, & unsafe AI hallucination risks. | Show main PulseGemma header & ESI Level Badge. |
-| **2. Act 1: Multilingual Voice Intake** | 0:35 - 1:10 | Demonstrate hands-free oral voice dictation in Spanish/Chinese. | Click **`1. Voice Dictation`** tab $\rightarrow$ Apply Spanish preset. |
-| **3. Act 2: 0ms Deterministic Safety** | 1:10 - 1:45 | Prove 0% LLM hallucination risk with 100% TypeScript rule engine. | Click **`2. Range Checker`** tab $\rightarrow$ Show Troponin panic alert. |
-| **4. Act 3: Multimodal Vision Scanner** | 1:45 - 2:15 | Showcase Gemma Multimodal Vision parsing X-rays & ECG strips. | Click **`3. Vision Scanner`** tab $\rightarrow$ Show ECG STEMI scan. |
-| **5. Act 4: Grounded Brief & EHR Export**| 2:15 - 2:45 | Demonstrate verbatim CPG RAG citations & 1-click EHR export. | Click **`5. Triage Brief`** tab $\rightarrow$ Click `[CPG-AHA-2023]` & Copy Brief. |
-| **6. The Impact & Closing** | 2:45 - 3:00 | Emphasize 100% local edge privacy, hardware flexibility, & zero HIPAA risk. | Show Ollama Model Selector & 100% Offline Status. |
+| **1. Hook & Problem** | 0:00 - 0:35 | Frame real-world ER triage bottlenecks & unsafe AI hallucination risks. | Show main PulseGemma header & ESI Level Badge. |
+| **2. System & Workflow Overview** | 0:35 - 1:15 | Explain the 6-Node Agentic DAG Pipeline & Local Tool Execution Layer. | Click **`Trace`** Debugger button to show live 6-node sequence. |
+| **3. Act 1: Multilingual Voice Intake** | 1:15 - 1:45 | Demonstrate hands-free oral voice dictation in Spanish/Chinese. | Click **`1. Voice Dictation`** tab $\rightarrow$ Apply Spanish preset. |
+| **4. Act 2: 0ms Deterministic Safety** | 1:45 - 2:15 | Prove 0% LLM hallucination risk with 100% TypeScript rule engine. | Click **`2. Range Checker`** tab $\rightarrow$ Show Troponin panic alert. |
+| **5. Act 3: Multimodal Vision Scanner** | 2:15 - 2:45 | Showcase Gemma Multimodal Vision parsing X-rays & ECG strips. | Click **`3. Vision Scanner`** tab $\rightarrow$ Show ECG STEMI scan. |
+| **6. Act 4: Grounded Brief & EHR Export**| 2:45 - 3:15 | Demonstrate verbatim CPG RAG citations & 1-click EHR export. | Click **`5. Triage Brief`** tab $\rightarrow$ Click `[CPG-AHA-2023]` & Copy Brief. |
+| **7. Impact & Closing** | 3:15 - 3:30 | Emphasize 100% local edge privacy, hardware flexibility, & zero HIPAA risk. | Show Ollama Model Selector & 100% Offline Status. |
 
 ---
 
@@ -28,10 +77,19 @@
 
 ---
 
-### 2. Act 1: Multilingual Hands-Free Voice Dictation (0:35 - 1:10)
-*(Action: Click `🫀 ACS Chest Pain` preset in the top header $\rightarrow$ Click `1. Voice Dictation` tab)*
+### 2. System Architecture & 6-Node Workflow Overview (0:35 - 1:15)
+*(Action: Click `Trace` Debugger button in top header bar to open the live pipeline sequence)*
 
-> *"Let’s look at a live patient. A non-English speaking patient arrives at the ER. Instead of struggling through language barriers, the triage nurse uses PulseGemma’s hands-free voice dictation."*
+> *"Architecturally, PulseGemma is NOT a simple chatbot. It is a **6-Node Agentic DAG State Machine** powered by a central **Unified Knowledge Base** and a **Local Tool Execution Layer**."*
+>
+> *"When a patient arrives, Node 1 normalizes multilingual voice inputs. Node 2 passes vitals through a **100% Deterministic Safety Engine** in 0 milliseconds. Node 3 processes physical medical images using Gemma Vision. Node 4 performs RAG retrieval over emergency clinical practice guidelines. Node 5 synthesizes the clinical brief, and Node 6 audits every citation to guarantee 100% grounded safety before exporting FHIR-compliant triage logs."*
+
+---
+
+### 3. Act 1: Multilingual Hands-Free Voice Dictation (1:15 - 1:45)
+*(Action: Click `🫀 ACS Chest Pain` preset in header $\rightarrow$ Click `1. Voice Dictation` tab)*
+
+> *"Let’s see this workflow in action. A non-English speaking patient arrives at the ER."*
 >
 > *"The patient speaks in Spanish: **'Tengo un dolor muy fuerte en el pecho que se me va al brazo izquierdo.'***"
 >
@@ -39,10 +97,10 @@
 
 ---
 
-### 3. Act 2: 100% Deterministic Safety Engine (1:10 - 1:45)
+### 4. Act 2: 100% Deterministic Safety Engine (1:45 - 2:15)
 *(Action: Click `2. Range Checker` tab)*
 
-> *"Now, how do we guarantee clinical safety? We NEVER ask an LLM to guess medical numbers."*
+> *"How do we guarantee clinical safety? We NEVER ask an LLM to guess medical numbers."*
 >
 > *"Here in Tab 2, our **100% Deterministic Safety Engine** evaluates laboratory biomarkers in **0 milliseconds** using pure TypeScript client code."*
 >
@@ -50,7 +108,7 @@
 
 ---
 
-### 4. Act 3: Multimodal Vision & OCR Scanner (1:45 - 2:15)
+### 5. Act 3: Multimodal Vision & OCR Scanner (2:15 - 2:45)
 *(Action: Click `3. Vision Scanner` tab)*
 
 > *"Because clinical triage involves physical artifacts like paper lab printouts and 12-lead ECGs, pure text models fail at this task. PulseGemma mandates a **Multimodal Vision AI Model** (`gemma4:vision`, `paligemma`, `llava`)."*
@@ -59,7 +117,7 @@
 
 ---
 
-### 5. Act 4: Grounded CPG RAG & 1-Click EHR Export (2:15 - 2:45)
+### 6. Act 4: Grounded CPG RAG & 1-Click EHR Export (2:45 - 3:15)
 *(Action: Click `5. Triage Brief` tab $\rightarrow$ Click `🔗 [CPG-AHA-2023-ACS-4.2]` citation link)*
 
 > *"Finally, Node 5 synthesizes a **5-Second Clinical Intake Brief** for the ER physician."*
@@ -70,19 +128,9 @@
 
 ---
 
-### 6. The Impact & Closing (2:45 - 3:00)
+### 7. The Impact & Closing (3:15 - 3:30)
 *(Action: Click Settings gear icon to show `gemma4:vision` local model tag)*
 
 > *"PulseGemma runs 100% locally on the edge via local Ollama models or our built-in offline simulator. That means **ZERO cloud latency, ZERO cloud API fees, and ZERO HIPAA data leakage**."*
 >
 > *"PulseGemma turns 10 minutes of EHR digging into a 5-second grounded clinical brief—saving lives at the edge. Thank you!"*
-
----
-
-## ⚡ 5 Tips for a Flawless Demo
-
-1. **Keep the Browser Open**: Pre-launch `http://localhost:3000` (`npm run dev`) before your presentation.
-2. **Use the Preset Selector**: Click `🫀 ACS Chest Pain` or `🔥 Severe Sepsis` in the top header bar to load instant test payloads.
-3. **Show Tab Switching**: Explicitly click through Tabs 1 $\rightarrow$ 2 $\rightarrow$ 3 $\rightarrow$ 5 to demonstrate the single-responsibility modular UI.
-4. **Click the Citation Link**: Always click `[CPG-AHA-2023-ACS-4.2]` in Tab 5 to showcase ground-truth evidence verification.
-5. **Demonstrate 1-Click EHR Copy**: Click **"Copy Brief to EHR"** and mention how much time it saves nurses.
