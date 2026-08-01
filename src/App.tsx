@@ -19,7 +19,7 @@ import { PatientVitals, MedicalImagePayload } from './types/clinical';
 export function App() {
   const [selectedCase, setSelectedCase] = useState<PresetEmergencyCase>(PRESET_EMERGENCY_CASES[0]);
   const [selectedModel, setSelectedModel] = useState<string>('gemma4:vision');
-  const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabKey>('VOICE_DICTATION');
+  const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabKey>('TRIAGE_SYNTHESIS');
   const [layoutMode, setLayoutMode] = useState<ViewLayoutMode>('MODULAR_GRID');
   
   // Modular Module Visibility Map
@@ -113,7 +113,51 @@ export function App() {
     setIsPipelineRunning(false);
   };
 
-  // Auto-run triage when case changes
+  // Quick Automated Demo Run Trigger for Specific Key Feature
+  const handleQuickDemoRun = async (targetFeature?: FeatureTabKey) => {
+    // Select best matching test case scenario per feature
+    let demoCase = PRESET_EMERGENCY_CASES[0]; // Default: ACS STEMI
+    if (targetFeature === 'VOICE_DICTATION') {
+      demoCase = PRESET_EMERGENCY_CASES[0]; // Spanish Chest Pain Dictation
+    } else if (targetFeature === 'DETERMINISTIC_LABS') {
+      demoCase = PRESET_EMERGENCY_CASES[2]; // Hyperkalemia K+ = 6.8 Panic Lab
+    } else if (targetFeature === 'MULTIMODAL_VISION') {
+      demoCase = PRESET_EMERGENCY_CASES[1]; // Sepsis Chest X-Ray Scan
+    } else if (targetFeature === 'GROUNDED_RAG') {
+      demoCase = PRESET_EMERGENCY_CASES[0]; // AHA ACS Guideline Grounding
+    } else if (targetFeature === 'TRIAGE_SYNTHESIS') {
+      demoCase = PRESET_EMERGENCY_CASES[0]; // Master Triage Synthesis
+    }
+
+    setSelectedCase(demoCase);
+    setRawTranscript(demoCase.rawTranscript);
+    setInputLanguage(demoCase.inputLanguage);
+    setVitals(demoCase.vitals);
+    setRawLabs(demoCase.rawLabs);
+    setUploadedImage(demoCase.image);
+
+    if (targetFeature) {
+      setLayoutMode('SINGLE_FOCUS');
+      setActiveFeatureTab(targetFeature);
+    }
+
+    setIsPipelineRunning(true);
+    const stateInput = createInitialState(
+      demoCase.patientProfile,
+      demoCase.vitals,
+      demoCase.rawLabs,
+      demoCase.rawTranscript,
+      demoCase.inputLanguage,
+      demoCase.image
+    );
+
+    const orchestrator = new AgentOrchestrator(stateInput, selectedModel);
+    orchestrator.subscribe((state) => setTriageState(state));
+    await orchestrator.runPipeline();
+    setIsPipelineRunning(false);
+  };
+
+  // Auto-run triage on initial launch
   useEffect(() => {
     handleRunTriage();
   }, [selectedCase]);
@@ -123,7 +167,7 @@ export function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-rose-500 selection:text-white font-sans">
       
-      {/* Header Bar */}
+      {/* Header Bar with Quick Feature Demo Actions */}
       <Header
         calculatedESI={triageState.node2_deterministicResults?.calculatedESI}
         selectedCaseId={selectedCase.id}
@@ -139,6 +183,7 @@ export function App() {
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenDebugger={() => setIsDebuggerOpen(true)}
         onRunTriage={handleRunTriage}
+        onQuickDemoRun={handleQuickDemoRun}
       />
 
       {/* Main Workspace Content */}
@@ -194,7 +239,7 @@ export function App() {
 
             </div>
 
-            {/* Right Column: Grounded RAG & Master Triage Brief (Width 5/12) */}
+            {/* Right Column: Master Triage Brief & Grounded RAG (Width 5/12) */}
             <div className="lg:col-span-5 space-y-6">
               
               {/* Module 5: Master Triage Brief */}
@@ -287,7 +332,7 @@ export function App() {
 
       {/* Footer */}
       <footer className="bg-slate-900 border-t border-slate-800 py-3 text-center text-xs text-slate-500 font-mono">
-        PulseGemma CDS Engine • Modular UI Architecture • 100% Offline Capable
+        PulseGemma CDS Engine • Feature Demo Shortcuts Active • 100% Offline Capable
       </footer>
 
       {/* Evidence Viewer Modal */}

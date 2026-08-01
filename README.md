@@ -10,9 +10,11 @@
 
 ---
 
-## ⚡ 30-Second Elevator Pitch
+## ⚡ 30-Second Elevator Pitch (In Plain Street English)
 
-> **"PulseGemma transforms Emergency Department (ED) triage by replacing slow EHR digging and unsafe conversational chatbots with a grounded, privacy-first Multimodal Edge-AI system. Because clinical triage requires analyzing Chest X-Rays, paper lab printouts, and ECG strips, PulseGemma mandates a Multimodal Vision AI Model (`gemma4:vision`, `gemma3:vision`, `paligemma`, `llava`, `llama3.2-vision`). It provides healthcare workers with a 5-second clinical brief, 100% deterministic lab alert safeguards, and hands-free multilingual voice dictation with zero cloud latency or HIPAA risk."**
+> **"Look, Emergency Rooms are straight-up chaotic. Nurses are drowning in paperwork, digging through clunky medical records for 10 minutes while sick patients sit in pain. On top of that, language barriers cause crazy mix-ups, and generic AI chatbots can't be trusted in medicine because they hallucinate fake numbers.**
+>
+> **Enter PulseGemma: a super fast, local AI assistant that actually reads X-rays, ECGs, and paper lab prints on the spot—with zero cloud latency and zero privacy leaks. In 5 seconds flat, it hands doctors a clean intake brief, flags critical panic labs with 0% guesswork, and translates voice notes in 20+ languages. No fluff, no cloud fees, just fast, safe ER triage right at the edge."**
 
 ---
 
