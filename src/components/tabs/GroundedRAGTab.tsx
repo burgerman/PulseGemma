@@ -24,41 +24,33 @@ export const GroundedRAGTab: React.FC<GroundedRAGTabProps> = ({
   return (
     <div className="space-y-4 max-w-4xl mx-auto">
       
-      {/* Feature Title Banner */}
-      <div className="bg-gradient-to-r from-sky-950/40 via-slate-900 to-slate-900 border border-sky-500/30 rounded-2xl p-5 shadow-lg">
+      {/* Header Banner */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400 shadow-md">
-            <BookOpen className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400">
+            <BookOpen className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-white font-mono flex items-center gap-2">
-              <span>Feature 4: Grounded CPG RAG & Evidence Engine</span>
-              <span className="px-2 py-0.5 text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30 rounded font-sans">
-                Verbatim Guidelines
-              </span>
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Retranslates clinical practice guidelines (AHA 2023 ACS, Surviving Sepsis 2021, ESI v4) into ground-truth evidence context.
-            </p>
+            <h2 className="text-sm font-bold text-white font-mono">Grounded CPG RAG & Evidence Engine</h2>
+            <p className="text-xs text-slate-400">Verbatim Clinical Practice Guidelines (AHA 2023 ACS, Sepsis, ESI v4)</p>
           </div>
         </div>
+
+        <span className="text-xs font-mono text-sky-400 font-bold bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20">
+          {retrievedGuidelines.length} Passages Matched
+        </span>
       </div>
 
-      {/* Currently Retrieved Guidelines for Active Patient */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-sky-400" />
-            <span>Retrieved CPG Passages for Active Patient (Node 4 RAG)</span>
-          </h3>
-          <span className="text-[11px] font-mono text-sky-400 font-bold">
-            {retrievedGuidelines.length} Passages Matched
-          </span>
-        </div>
+      {/* Matched Passages */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg">
+        <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-1.5 border-b border-slate-800 pb-2">
+          <ShieldCheck className="w-4 h-4 text-sky-400" />
+          <span>Active Patient CPG Evidence Context</span>
+        </h3>
 
-        <div className="grid grid-cols-1 gap-3">
+        <div className="space-y-2.5">
           {retrievedGuidelines.map((passage, idx) => (
-            <div key={idx} className="bg-slate-950 p-4 rounded-xl border border-sky-500/30 space-y-2 shadow-sm">
+            <div key={idx} className="bg-slate-950 p-3.5 rounded-xl border border-sky-500/30 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono font-bold text-xs border border-sky-500/30">
@@ -69,55 +61,46 @@ export const GroundedRAGTab: React.FC<GroundedRAGTabProps> = ({
 
                 <button
                   onClick={() => onOpenEvidenceModal(passage.citationId)}
-                  className="px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-xs font-mono transition flex items-center gap-1 cursor-pointer"
+                  className="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 text-[11px] font-mono transition flex items-center gap-1 cursor-pointer"
                 >
                   <ExternalLink className="w-3 h-3" /> Inspect
                 </button>
               </div>
 
-              <p className="text-xs text-slate-300 font-sans leading-relaxed bg-slate-900 p-3 rounded-lg border border-slate-800">
+              <p className="text-xs text-slate-300 font-sans leading-relaxed bg-slate-900 p-2.5 rounded-lg border border-slate-800">
                 "{passage.text}"
               </p>
-
-              <div className="flex flex-wrap gap-1 font-mono text-[10px] text-slate-500">
-                <span>Keywords:</span>
-                {passage.keywords.map((kw, kidx) => (
-                  <span key={kidx} className="text-slate-400">#{kw}</span>
-                ))}
-              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Guidelines Knowledge Registry Browser */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
-          <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-slate-400" />
-            <span>Search Full Emergency Guidelines Knowledge Registry</span>
+      {/* Guidelines Browser */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+          <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
+            Emergency Guidelines Registry Browser
           </h3>
 
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search AHA, Sepsis, ESI guidelines..."
-              className="bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500/50 font-mono w-64"
+              placeholder="Search guidelines..."
+              className="bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500/50 font-mono w-52"
             />
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filteredGuidelines.map((g, idx) => (
-            <div key={idx} className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-sky-400">[{g.citationId}]</span>
-                <span className="text-[11px] font-mono text-slate-400">{g.section}</span>
+            <div key={idx} className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="font-bold text-sky-400">[{g.citationId}]</span>
+                <span className="text-[10px] text-slate-500">{g.section}</span>
               </div>
-
               <h4 className="text-xs font-bold text-white">{g.sourceTitle}</h4>
               <p className="text-xs text-slate-300 leading-relaxed font-sans">{g.text}</p>
             </div>
