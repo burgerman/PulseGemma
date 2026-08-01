@@ -1,17 +1,17 @@
 # 🤖 Local Agentic Orchestrator & Workflow Implementation Plan
-### PulseGemma: Grounded Edge-AI Clinical Triage Engine (Gemma 4 12B)
+### PulseGemma: Grounded Edge-AI Clinical Triage Engine (Multimodal Vision)
 
-> **"A multi-agent, event-driven local orchestration pipeline powered by a Local Tool Calling Execution Layer and a Unified Knowledge Base Data Layer, combining Ollama Gemma 4 12B's advanced reasoning with 100% grounded deterministic safety controls."**
+> **"A multi-agent, event-driven local orchestration pipeline powered by a Local Tool Calling Execution Layer and a Unified Knowledge Base Data Layer, combining Multimodal Vision AI reasoning with 100% grounded deterministic safety controls."**
 
 ---
 
 ## 🛠️ 1. Local Tool Calling Execution Layer (`src/agent/tools/*`)
 
-To make the agentic workflow robust, smart, and extensible, **PulseGemma** equips **Gemma 4 12B** and the sub-agent nodes with a suite of **Local Executable Tools**. Instead of relying on parametric memory or guessing, Gemma 4 12B calls local client-side tool functions deterministically.
+To make the agentic workflow robust, smart, and extensible, **PulseGemma** equips the Multimodal Vision AI Engine and sub-agent nodes with a suite of **Local Executable Tools**. Instead of relying on parametric memory or guessing, the AI engine calls local client-side tool functions deterministically.
 
 ```
                               ┌────────────────────────────────────────────────────────┐
-                              │         GEMMA 4 12B REASONING & AGENT NODES            │
+                              │    MULTIMODAL VISION REASONING & AGENT NODES           │
                               └───────────────────────────┬────────────────────────────┘
                                                           │
                                                           ▼ (Function Calling / Tool Execution)
@@ -49,13 +49,13 @@ To make the agentic workflow robust, smart, and extensible, **PulseGemma** equip
 
 ---
 
-## 🧠 2. Leveraging Gemma 4 12B Advanced Reasoning & Tool Calling
+## 👁️ 2. Leveraging Multimodal Vision Advanced Reasoning & Tool Calling
 
-PulseGemma maximizes **Gemma 4 12B's high-level reasoning, complex natural language understanding (NLU), and tool calling capabilities** while enforcing strict grounding over the `UnifiedKnowledgeBase`:
+PulseGemma maximizes **Multimodal Vision AI's high-level reasoning, image tensor parsing, complex natural language understanding (NLU), and tool calling capabilities** while enforcing strict grounding over the `UnifiedKnowledgeBase`:
 
 ```
                        ┌────────────────────────────────────────────────────────┐
-                       │        GEMMA 4 12B ADVANCED REASONING ENGINES          │
+                       │       MULTIMODAL VISION ADVANCED REASONING ENGINES     │
                        └───────────────────────────┬────────────────────────────┘
                                                    │
          ┌─────────────────────────────────────────┼─────────────────────────────────────────┐
@@ -112,9 +112,9 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
         │
         ▼
   ┌────────────┐
-  │  Step 1    │ Node 1: Multilingual Gemma 4 12B Normalization
+  │  Step 1    │ Node 1: Multilingual Multimodal Normalization
   │            │ • Interpret language (e.g. 'es') -> Translate to English
-  │            │ • Gemma 4 12B maps colloquial phrases to SNOMED clinical concepts
+  │            │ • Multimodal NLU maps colloquial phrases to SNOMED clinical concepts
   └─────┬──────┘
         │
         ▼
@@ -128,8 +128,8 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
         │
         ▼
   ┌────────────┐
-  │  Step 3    │ Node 3: Gemma 4 Vision OCR & Radiologic Feature Agent
-  │            │ • If medical image present -> Call Ollama Vision API (gemma4:12b / llava)
+  │  Step 3    │ Node 3: Gemma Multimodal Vision OCR & Radiologic Feature Agent
+  │            │ • If medical image present -> Call Ollama Vision API (gemma4:vision / llava)
   │            │ • Extract paper lab sheet values & X-Ray visual findings
   └─────┬──────┘
         │
@@ -142,8 +142,8 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
         │
         ▼
   ┌────────────┐
-  │  Step 5    │ Node 5: Gemma 4 12B Clinical Reasoning & Citation Engine
-  │            │ • Gemma 4 12B synthesizes multi-source data strictly using CPG passages
+  │  Step 5    │ Node 5: Multimodal Vision Clinical Reasoning & Citation Engine
+  │            │ • Synthesizes multi-source data strictly using CPG passages
   │            │ • Generates 5-Second Brief + Grounded Differentials with [Citations]
   │            │ • Invoke Local Tool: tool_generate_patient_discharge_note
   └─────┬──────┘
@@ -183,7 +183,7 @@ To enable total transparency, review, and step-by-step debugging, the orchestrat
 
 ### Core Architecture Modules (`src/*`)
 - `src/knowledge/index.ts` (Unified Knowledge Base Data Layer)
-- `src/agent/Orchestrator.ts` (Master Workflow Coordinator executing Gemma 4 12B pipeline)
+- `src/agent/Orchestrator.ts` (Master Workflow Coordinator executing Multimodal Vision pipeline)
 - `src/agent/PipelineDebugger.ts` (Debugger Service)
 - `src/agent/nodes/node1_normalizer.ts` through `node6_safetyValidator.ts`
 - `src/components/WorkflowDebugger.tsx` (UI Debugger Drawer)

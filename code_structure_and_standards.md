@@ -1,7 +1,7 @@
 # 📐 PulseGemma: Production-Grade Code Structure & Coding Standards
-### Architecture Blueprint & Developer Engineering Guidelines (Gemma 4 12B)
+### Architecture Blueprint & Developer Engineering Guidelines
 
-> **"Production-ready TypeScript & React architecture for clinical-grade edge applications powered by Ollama Gemma 4 12B: zero implicit type casting, local tool execution registry, pure deterministic functions, circuit-breaker resilience, and WCAG AA accessible UI design."**
+> **"Production-ready TypeScript & React architecture for clinical-grade edge applications: zero implicit type casting, mandatory Multimodal Vision model support, local tool execution registry, pure deterministic functions, circuit-breaker resilience, and WCAG AA accessible UI design."**
 
 ---
 
@@ -13,9 +13,12 @@ PulseGemma/
 ├── package.json                         # Dependencies & npm scripts
 ├── tsconfig.json                        # Strict TypeScript configuration
 ├── vite.config.ts                       # Vite bundler config with path aliases (@/*)
-├── README.md                            # Executive overview & project blueprint (Gemma 4 12B)
+├── README.md                            # Executive overview & project blueprint (Multimodal Vision)
 ├── agent_orchestrator_plan.md           # 6-Node agentic pipeline & tool execution specification
 ├── code_structure_and_standards.md      # Production coding standards (THIS FILE)
+├── feature_deterministic_range_checker.md # Feature 1 Spec
+├── feature_handsfree_voice_dictation.md   # Feature 2 Spec
+├── feature_grounded_cpg_rag.md            # Feature 3 Spec
 │
 └── src/
     ├── main.tsx                         # React 18 application mount
@@ -39,7 +42,7 @@ PulseGemma/
     │   ├── esiCalculator.ts             # ESI v4 decision tree evaluator
     │   └── riskScoreCalculator.ts       # qSOFA, Wells PE, & TIMI ACS scoring
     │
-    ├── agent/                           # Multi-Agent Orchestrator Pipeline (Gemma 4 12B)
+    ├── agent/                           # Multi-Agent Orchestrator Pipeline
     │   ├── Orchestrator.ts              # Master pipeline coordinator (State Machine)
     │   ├── PipelineDebugger.ts          # Debugger service & trace logger
     │   ├── state.ts                     # State factory & mutation helpers
@@ -54,13 +57,13 @@ PulseGemma/
     │   └── nodes/                       # Pipeline Execution Nodes
     │       ├── node1_normalizer.ts      # Multilingual Translation & NLU Node
     │       ├── node2_deterministicRules.ts# Deterministic Safety Check Node
-    │       ├── node3_visionAgent.ts     # Gemma 4 Vision OCR & Radiologic Feature Node
+    │       ├── node3_visionAgent.ts     # Multimodal Vision OCR & Radiologic Feature Node
     │       ├── node4_ragRetrieval.ts    # Ground-Truth RAG Retrieval Node
-    │       ├── node5_gemmaReasoner.ts   # Gemma 4 12B Clinical Reasoning Node
+    │       ├── node5_gemmaReasoner.ts   # Multimodal Reasoning Node
     │       └── node6_safetyValidator.ts # AST Grounding Safety Guardrail Node
     │
     ├── services/                        # Edge AI & Speech Integration
-    │   ├── ollamaService.ts             # Ollama REST API client (`gemma4:12b`) + Circuit Breaker
+    │   ├── ollamaService.ts             # Multimodal Vision Ollama API client + Circuit Breaker
     │   ├── webSpeechService.ts          # Browser Web Speech API wrapper
     │   └── mockDataService.ts           # Pre-loaded ER Emergency Test Cases
     │
@@ -80,56 +83,46 @@ PulseGemma/
 
 ## ⚙️ 2. Production Coding Standards
 
-### 🛡️ Rule A: Strict Type Safety (No `any`, No Implicit Casting)
+### 👁️ Rule A: Mandatory Multimodal Vision Model Requirement
+
+Because clinical triage processes physical medical images (Chest X-Rays, paper lab sheet OCR, ECG strips), **pure text language models cannot execute these tasks**. The service layer MUST validate that the selected local Ollama model supports image payload inputs (`images: [base64String]`):
 
 ```typescript
-export type LabStatus = 'CRITICAL_HIGH' | 'CRITICAL_LOW' | 'ABNORMAL_HIGH' | 'ABNORMAL_LOW' | 'NORMAL';
-
-export interface EvaluatedLabResult {
-  readonly testId: string;
-  readonly testName: string;
-  readonly value: number;
-  readonly unit: string;
-  readonly status: LabStatus;
-  readonly referenceMin: number;
-  readonly referenceMax: number;
-  readonly isCritical: boolean;
-}
-```
-
-- **Rule A1**: `tsconfig.json` MUST enforce `"strict": true`, `"noImplicitAny": true`, `"noUnusedLocals": true`.
-- **Rule A2**: All data models MUST use `readonly` properties for state snapshots.
-
----
-
-### 🔌 Rule B: Resilient Edge API Integration & Circuit Breakers (Gemma 4 12B)
-
-- Network calls to Ollama (`http://localhost:11434`) targeting `gemma4:12b` MUST be wrapped in a **Circuit Breaker** pattern with an 8000ms timeout.
-- If Ollama is offline or times out, the system MUST gracefully fall back to the built-in offline simulator without crashing the UI.
-
-```typescript
-// ✅ PRODUCTION STANDARD (Circuit Breaker & Fallback for Gemma 4 12B)
-export async function callOllamaGemma4<T>(
+// ✅ PRODUCTION STANDARD (Multimodal Vision Model Call & Circuit Breaker)
+export async function callOllamaMultimodalVision<T>(
   prompt: string,
+  base64Images: string[] = [],
+  modelName: string = 'gemma4:vision',
   fallbackGenerator: () => T,
-  timeoutMs: number = 8000
+  timeoutMs: number = 10000
 ): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
+    const payload: Record<string, unknown> = {
+      model: modelName,
+      prompt,
+      stream: false
+    };
+
+    // Attach base64 image array for Multimodal Vision models
+    if (base64Images.length > 0) {
+      payload.images = base64Images;
+    }
+
     const response = await fetch('http://localhost:11434/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'gemma4:12b', prompt, stream: false }),
+      body: JSON.stringify(payload),
       signal: controller.signal
     });
     clearTimeout(timer);
-    if (!response.ok) throw new Error(`Ollama HTTP Error: ${response.status}`);
+    if (!response.ok) throw new Error(`Ollama Vision HTTP Error: ${response.status}`);
     const data = await response.json();
     return JSON.parse(data.response) as T;
   } catch (error) {
-    console.warn('[Ollama Gemma 4 12B API] Connection failed or timed out. Engaging Edge Fallback Simulator.', error);
+    console.warn(`[Ollama Multimodal Vision] Call to ${modelName} failed/timed out. Engaging Client Edge Vision Fallback Engine.`, error);
     return fallbackGenerator();
   }
 }
@@ -137,7 +130,7 @@ export async function callOllamaGemma4<T>(
 
 ---
 
-### 🎨 Rule C: ER High-Contrast UI & Accessibility (WCAG AA)
+### 🎨 Rule B: ER High-Contrast UI & Accessibility (WCAG AA)
 
 - **Color Tokens (`src/styles/tokens.css`)**:
   - `CRITICAL_HIGH`: `#DC2626` (Red 600 - High Contrast)

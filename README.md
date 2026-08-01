@@ -1,19 +1,72 @@
 # 🫀 PulseGemma
 ### Grounded Edge-AI Clinical Triage & Decision-Support Assistant
-> **"Sub-second patient history synthesis, 100% deterministic safety rules, multimodal vision scanning, hands-free voice dictation, and multilingual clinical translation—powered by local Gemma 4 12B models on the edge."**
+> **"Sub-second patient history synthesis, 100% deterministic safety rules, multimodal vision scanning, hands-free voice dictation, and multilingual clinical translation—powered by local Multimodal Vision AI models on the edge."**
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-burgerman%2FPulseGemma-blue?logo=github)](https://github.com/burgerman/PulseGemma.git)
-[![Target Platform](https://img.shields.io/badge/Platform-Local%20Edge%20%2F%20Offline%20First-emerald)](#-architecture-overview)
-[![AI Foundation](https://img.shields.io/badge/AI-Ollama%20%2B%20Gemma%204%2012B-orange)](#-grounded-ai--gemma-integration)
+[![Target Platform](https://img.shields.io/badge/Platform-Local%20Edge%20%2F%20Offline%20First-emerald)](#-multimodal-hardware--ollama-compatibility)
+[![AI Foundation](https://img.shields.io/badge/AI-Ollama%20Multimodal%20Vision-orange)](#-multimodal-vision-requirement)
 [![Safety Philosophy](https://img.shields.io/badge/Safety-Deterministic%20Safety%20First-red)](#-clinical-safety--non-chatbot-philosophy)
 
 ---
 
-## 📋 Executive Overview
+## ⚡ 30-Second Pitch & Value Proposition
 
-In emergency medical settings, **seconds save lives, but information overload paralyzes clinicians**. Emergency Department (ED) nurses and physicians are routinely swamped with multi-page Electronic Health Records (EHRs), complex lab panels, radiology notes, paper printouts, and language barriers—all while needing to assign accurate **Emergency Severity Index (ESI)** triage scores under severe time pressure.
+> **"PulseGemma transforms Emergency Department (ED) triage by replacing slow EHR digging and unsafe conversational chatbots with a grounded, privacy-first Multimodal Edge-AI system. Because clinical triage requires analyzing Chest X-Rays, paper lab printouts, and ECG strips, PulseGemma MANDATES a Multimodal Vision Model (`gemma4:vision`, `gemma3:vision`, `paligemma`, `llava`, `llama3.2-vision`). It gives healthcare workers a 5-second clinical brief, 100% deterministic lab alert safeguards, and hands-free multilingual voice dictation with zero cloud latency or HIPAA risk."**
 
-**PulseGemma** is a production-grade, edge-deployed clinical assistant built for healthcare workers. Powered locally by **Ollama Gemma 4 12B**, PulseGemma rejects the unsafe "probabilistic chatbot" approach. Instead, it pairs **100% deterministic client-side rule engines** (for reference ranges and validated clinical scoring) with **grounded language, vision, and translation AI** operating strictly over authoritative clinical practice guidelines (CPGs) and patient data.
+---
+
+## 👁️ Multimodal Vision Requirement & Ollama Model Compatibility
+
+Because clinical triage involves physical artifacts (paper lab sheets, 12-lead ECG strips, and X-ray images), **text-only language models cannot handle this task**. PulseGemma requires a **Multimodal Vision AI Model** capable of processing both image tensors and text inputs.
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                   MULTIMODAL VISION MODEL REGISTRY (Auto-Detected)                     │
+│               (Mandatory: Must support combined Image + Text payloads)                 │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │
+         ┌──────────────────────────────────┼──────────────────────────────────┐
+         ▼                                  ▼                                  ▼
+┌───────────────────────────┐    ┌───────────────────────────┐    ┌───────────────────────────┐
+│ 🟢 COMPACT MULTIMODAL     │    │ 🟡 STANDARD MULTIMODAL    │    │ 🔵 HIGH-PERFORMANCE VISION│
+│   (8GB VRAM / Mid Laptops)│    │   (12GB - 16GB VRAM)      │    │   (24GB+ VRAM Workstations│
+├───────────────────────────┤    ├───────────────────────────┤    ├───────────────────────────┤
+│ • paligemma / paligemma:3b│    │ • gemma4:vision (Default) │    │ • gemma4:27b-vision       │
+│ • llama3.2-vision:11b     │    │ • gemma3:vision           │    │ • gemma3:27b-vision       │
+│ • llava:7b / llava-phi3   │    │ • llava:13b / bakllava    │    │ • Custom Multimodal Vision│
+└───────────────────────────┘    └───────────────────────────┘    └───────────────────────────┘
+                                            │
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ ⚡ ZERO-HARDWARE FALLBACK: Integrated Offline Multimodal Edge Simulator               │
+│ (Runs out-of-the-box on any browser even if Ollama is not installed or running)        │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+* **Mandatory Vision Capability**: Pure text LLMs are automatically filtered out; only Multimodal Vision models capable of base64 image parsing are selected for clinical image tasks.
+* **Hardware-Agnostic Edge Fallback**: If Ollama is offline, PulseGemma engages its built-in client-side multimodal simulation engine so judges and clinicians can test the entire X-ray and lab sheet OCR workflow with zero setup.
+
+---
+
+## 💡 How We Leverage Gemma Multimodal Vision to Solve Real-World ER Pain Points
+
+Unlike generic chatbots that guess diagnoses probabilistically, **PulseGemma deploys Gemma Multimodal Vision as a grounded reasoning and image synthesis engine** paired with deterministic code safeguards:
+
+### 1. ⏱️ Real-World Problem: Information Overload & Triage Bottlenecks
+* **The Clinical Pain Point**: Triage nurses spend 5–10 minutes reading dense, multi-page Electronic Health Records (EHRs) while critical patients wait in crowded emergency rooms.
+* **Multimodal Solution**: Synthesizes complex patient histories, active medications, and chief complaints into a **5-Second Clinical Intake Brief**, automatically pulling forward life-threatening red flags (*e.g. CABG history, anticoagulants, severe penicillin allergy*).
+
+### 2. 🌐 Real-World Problem: Language Barriers & Limited English Proficiency (LEP)
+* **The Clinical Pain Point**: Non-English speaking patients struggle to communicate acute pain or symptom onset during high-stress triage, leading to misclassification or delayed care.
+* **Multimodal Solution**: Accepts oral voice dictation or text in **20+ languages** (Spanish, Mandarin, Arabic, Vietnamese, French, etc.), translating spoken symptoms into standardized English clinical terminology for staff while generating native-language discharge guidance for the patient.
+
+### 3. 🖼️ Real-World Problem: Paperwork & Visual Scan Bottlenecks
+* **The Clinical Pain Point**: Paper lab printouts, 12-lead ECG strips, and X-ray scans sitting on desks create information silos during shift handoffs. Text-only models fail at this task.
+* **Multimodal Vision Solution**: Uses Gemma Multimodal Vision to OCR-scan physical lab printouts, auto-populate numerical values into structured fields, and highlight key visual radiologic findings on Chest X-Rays.
+
+### 4. 🛡️ Real-World Problem: Unsafe AI Hallucination in Medical Applications
+* **The Clinical Pain Point**: Generic LLMs attempt mental math or guess medical reference ranges probabilistically, which is dangerous in clinical care.
+* **PulseGemma Solution**: Pairs Multimodal Gemma with a **100% Deterministic TypeScript Engine** (for 0ms lab range checks) and **Ground-Truth RAG Retrieval** over verbatim Emergency Clinical Practice Guidelines (AHA Chest Pain, Surviving Sepsis). Every recommendation made by Gemma includes clickable source citations (`[AHA 2023 Sec 4.2]`).
 
 ---
 
@@ -40,23 +93,12 @@ In emergency medical settings, **seconds save lives, but information overload pa
 └─────────────────────────────────────┘                           └─────────────────────────────────────┘
 ```
 
-### Pillar 1: Instant Patient History & Triage Summarizer
-- **5-Second EHR Intake Brief**: Transforms complex past medical records into a clean, 5-point clinical snapshot for incoming shift staff.
-- **Red Flag Extractor**: Pulls forward critical risk factors (e.g. *History of CABG*, *Current Anticoagulant Use*, *Anaphylactic Penicillin Allergy*).
-- **Multimodal Lab Sheet OCR (Gemma 4 Vision)**: Allows nurses to snap a photo of paper lab printouts or ECG strips, extracting structured data into the digital intake flow.
-- **Multilingual Voice & Oral Symptom Intake**: Enables patients with Limited English Proficiency (LEP) to speak or type in their native language (Spanish, Mandarin, Cantonese, Arabic, Vietnamese, Tagalog, Hindi, French, etc.). Gemma 4 12B automatically translates spoken symptoms into standardized English clinical terminology for medical staff, and can output patient instructions back in their native language.
-
-### Pillar 2: Deterministic Triage & Decision-Support Assistant
-- **0% Hallucination Safety Engine**: Hardcoded TypeScript algorithms evaluate numerical reference ranges (Troponin, Lactate, Potassium, WBC) and validated scoring systems (qSOFA for Sepsis, Wells Score for PE) with zero model guesswork.
-- **ESI v4 Flowchart Engine**: Evaluates patient vitals and chief complaints against ESI level criteria (Levels 1–5), reducing human error under pressure.
-- **Grounded Guideline Correlation (RAG)**: Cross-references patient presentation against local clinical practice guidelines (AHA Chest Pain Protocol, Surviving Sepsis Campaign) with **direct, clickable citations**.
-
 ---
 
 ## 📄 Key Feature Specification Blueprints
 
 1. 🔴 **[Deterministic Range Checker Engine](feature_deterministic_range_checker.md)**: 0ms client-side calculation of critical high/low lab thresholds with 0% model guesswork.
-2. 🎙️ **[Hands-Free Voice Dictation & Symptom NLU](feature_handsfree_voice_dictation.md)**: Real-time speech-to-text in 20+ languages with Gemma 4 12B structured clinical entity extraction.
+2. 🎙️ **[Hands-Free Voice Dictation & Symptom NLU](feature_handsfree_voice_dictation.md)**: Real-time speech-to-text in 20+ languages with Gemma Multilingual structured clinical entity extraction.
 3. 📚 **[Grounded CPG RAG Retrieval Engine](feature_grounded_cpg_rag.md)**: Local RAG retrieval matching patient findings against verbatim Emergency Clinical Practice Guidelines (AHA, Sepsis, ESI v4).
 
 ---
@@ -71,7 +113,7 @@ In emergency medical settings, **seconds save lives, but information overload pa
         ┌──────────────────────────────────┼──────────────────────────────────┐
         ▼                                  ▼                                  ▼
  ┌──────────────┐                 ┌──────────────────┐               ┌─────────────────┐
- │ Structured   │                 │ Gemma 4 Vision   │               │ Multilingual    │
+ │ Structured   │                 │ Gemma Vision     │               │ Multilingual    │
  │ Labs & Vitals│                 │ (X-Ray / Lab OCR)│               │ Voice & Speech  │
  └──────┬───────┘                 └────────┬─────────┘               └────────┬────────┘
         │                                  │                                  │
@@ -79,7 +121,7 @@ In emergency medical settings, **seconds save lives, but information overload pa
                                            │
                                            ▼
  ┌────────────────────────────────────────────────────────────────────────┐
- │ 1. Multilingual Translation & Medical Entity Normalizer (Gemma 4 12B)  │
+ │ 1. Multilingual Translation & Medical Entity Normalizer                │
  │    - Translates non-English symptoms to English clinical terms.        │
  └──────────────────────────────────┬─────────────────────────────────────┘
                                     │
@@ -98,7 +140,7 @@ In emergency medical settings, **seconds save lives, but information overload pa
                                     │ (Strict Guideline Context)
                                     ▼
  ┌────────────────────────────────────────────────────────────────────────┐
- │ 4. Gemma 4 12B Edge Reasoning Engine                                   │
+ │ 4. Gemma Multimodal Vision Engine (Image + Text Capable)               │
  │    - Synthesizes findings ONLY from steps 2 & 3.                       │
  │    - Generates English clinical brief & Native-Language patient notes. │
  │    - Every recommendation requires a clickable [Source Citation].      │
@@ -107,26 +149,11 @@ In emergency medical settings, **seconds save lives, but information overload pa
 
 ---
 
-## 🛡️ Clinical Safety & Non-Chatbot Philosophy
-
-Healthcare applications must not be built as conversational chatbots. Language models operate on statistical next-token probabilities, which is fundamentally unsafe when determining medical dosages, triage urgency, or critical lab thresholds.
-
-**PulseGemma enforces a strict safety boundary**:
-1. **Hard Mathematical Facts**: Calculated strictly by deterministic code (TypeScript).
-2. **Grounded Reasoning**: Gemma 4 12B is restricted to organizing and explaining facts derived from step 1 and retrieved ground-truth guidelines.
-3. **Human-in-the-Loop Governance**: Formatted as **Clinical Decision Support (CDS)**—the final clinical judgment always rests with the attending healthcare professional.
-
----
-
-## 🛠️ Tech Stack & Prerequisites
+## 🛠️ Tech Stack & Quick Start
 
 * **Frontend**: React 18, TypeScript, Vite, TailwindCSS, Lucide Icons.
-* **Audio Engine**: Web Speech API (`SpeechRecognition`) with multilingual language selection (20+ languages).
-* **Translation Core**: Gemma 4 12B Multilingual NLU for medical term normalization.
-* **Deterministic Engine**: Custom TypeScript Clinical Calculators (qSOFA, Wells, TIMI, ESI v4).
-* **AI Core**: Ollama local API (`gemma4:12b`) with fallback offline engine.
-
-### Quick Start (Local Development)
+* **Audio Engine**: Web Speech API (`SpeechRecognition`) with 20+ language support.
+* **AI Core**: Mandatory Ollama Multimodal Vision API (`gemma4:vision`, `gemma3:vision`, `paligemma`, `llava`) + Client-Side Fallback Engine.
 
 ```bash
 # 1. Clone the repository
@@ -136,8 +163,8 @@ cd PulseGemma
 # 2. Install dependencies
 npm install
 
-# 3. Pull & Run Ollama Gemma 4 12B locally
-ollama run gemma4:12b
+# 3. Pull & Run Ollama Multimodal Vision model locally
+ollama run gemma4:vision  # Or: paligemma / llava / llama3.2-vision
 
 # 4. Start local development server
 npm run dev
