@@ -19,6 +19,7 @@ import { PatientVitals, MedicalImagePayload } from './types/clinical';
 export function App() {
   const [selectedCase, setSelectedCase] = useState<PresetEmergencyCase>(PRESET_EMERGENCY_CASES[0]);
   const [selectedModel, setSelectedModel] = useState<string>('gemma4:vision');
+  const [vlmApiKey, setVlmApiKey] = useState<string>('');
   const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabKey>('TRIAGE_SYNTHESIS');
   const [layoutMode, setLayoutMode] = useState<ViewLayoutMode>('MODULAR_GRID');
   
@@ -95,7 +96,7 @@ export function App() {
     setUploadedImage(img);
   };
 
-  // Run Triage Pipeline
+  // Run Triage Pipeline (Hybrid Cloud VLM Node 3 + Local Gemma Node 5)
   const handleRunTriage = async () => {
     setIsPipelineRunning(true);
     const stateInput = createInitialState(
@@ -107,7 +108,7 @@ export function App() {
       uploadedImage || selectedCase.image
     );
 
-    const orchestrator = new AgentOrchestrator(stateInput, selectedModel);
+    const orchestrator = new AgentOrchestrator(stateInput, selectedModel, vlmApiKey);
     orchestrator.subscribe((state) => setTriageState(state));
     await orchestrator.runPipeline();
     setIsPipelineRunning(false);
@@ -115,18 +116,17 @@ export function App() {
 
   // Quick Automated Demo Run Trigger for Specific Key Feature
   const handleQuickDemoRun = async (targetFeature?: FeatureTabKey) => {
-    // Select best matching test case scenario per feature
     let demoCase = PRESET_EMERGENCY_CASES[0]; // Default: ACS STEMI
     if (targetFeature === 'VOICE_DICTATION') {
-      demoCase = PRESET_EMERGENCY_CASES[0]; // Spanish Chest Pain Dictation
+      demoCase = PRESET_EMERGENCY_CASES[0];
     } else if (targetFeature === 'DETERMINISTIC_LABS') {
-      demoCase = PRESET_EMERGENCY_CASES[2]; // Hyperkalemia K+ = 6.8 Panic Lab
+      demoCase = PRESET_EMERGENCY_CASES[2];
     } else if (targetFeature === 'MULTIMODAL_VISION') {
-      demoCase = PRESET_EMERGENCY_CASES[1]; // Sepsis Chest X-Ray Scan
+      demoCase = PRESET_EMERGENCY_CASES[1];
     } else if (targetFeature === 'GROUNDED_RAG') {
-      demoCase = PRESET_EMERGENCY_CASES[0]; // AHA ACS Guideline Grounding
+      demoCase = PRESET_EMERGENCY_CASES[0];
     } else if (targetFeature === 'TRIAGE_SYNTHESIS') {
-      demoCase = PRESET_EMERGENCY_CASES[0]; // Master Triage Synthesis
+      demoCase = PRESET_EMERGENCY_CASES[0];
     }
 
     setSelectedCase(demoCase);
@@ -151,7 +151,7 @@ export function App() {
       demoCase.image
     );
 
-    const orchestrator = new AgentOrchestrator(stateInput, selectedModel);
+    const orchestrator = new AgentOrchestrator(stateInput, selectedModel, vlmApiKey);
     orchestrator.subscribe((state) => setTriageState(state));
     await orchestrator.runPipeline();
     setIsPipelineRunning(false);
@@ -332,7 +332,7 @@ export function App() {
 
       {/* Footer */}
       <footer className="bg-slate-900 border-t border-slate-800 py-3 text-center text-xs text-slate-500 font-mono">
-        PulseGemma CDS Engine • Feature Demo Shortcuts Active • 100% Offline Capable
+        PulseGemma CDS Engine • Hybrid Cloud VLM + Local Gemma Synthesizer • 100% Offline Capable
       </footer>
 
       {/* Evidence Viewer Modal */}
@@ -352,7 +352,9 @@ export function App() {
       <SettingsModal
         isOpen={isSettingsOpen}
         selectedModel={selectedModel}
+        vlmApiKey={vlmApiKey}
         onSelectModel={setSelectedModel}
+        onUpdateVlmApiKey={setVlmApiKey}
         onClose={() => setIsSettingsOpen(false)}
       />
 

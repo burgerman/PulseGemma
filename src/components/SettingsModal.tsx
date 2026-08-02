@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { X, Settings, Cpu, RefreshCw, CheckCircle, WifiOff } from 'lucide-react';
+import { X, Settings, Cpu, RefreshCw, CheckCircle, WifiOff, Key, Sparkles } from 'lucide-react';
 import { getInstalledOllamaModels } from '../services/ollamaService';
 
 interface SettingsModalProps {
   isOpen: boolean;
   selectedModel: string;
+  vlmApiKey?: string;
   onSelectModel: (model: string) => void;
+  onUpdateVlmApiKey?: (key: string) => void;
   onClose: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   selectedModel,
+  vlmApiKey = '',
   onSelectModel,
+  onUpdateVlmApiKey,
   onClose
 }) => {
   const [installedModels, setInstalledModels] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [apiKeyInput, setApiKeyInput] = useState<string>(vlmApiKey);
 
   const fetchModels = async () => {
     setIsLoading(true);
@@ -28,8 +33,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       fetchModels();
+      setApiKeyInput(vlmApiKey);
     }
-  }, [isOpen]);
+  }, [isOpen, vlmApiKey]);
 
   if (!isOpen) return null;
 
@@ -41,7 +47,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <div className="flex items-center justify-between pb-3 border-b border-slate-800">
           <div className="flex items-center gap-2">
             <Settings className="w-5 h-5 text-emerald-400" />
-            <h2 className="text-sm font-bold text-white font-mono">Ollama Model & Hardware Settings</h2>
+            <h2 className="text-sm font-bold text-white font-mono">Hybrid Architecture & VLM Settings</h2>
           </div>
 
           <button
@@ -52,11 +58,42 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        {/* Model Auto-Discovery List */}
+        {/* Cloud VLM Vision API Key Configuration */}
+        <div className="bg-slate-950 p-3.5 rounded-xl border border-purple-500/30 space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-purple-300 font-mono flex items-center gap-1.5 uppercase">
+              <Sparkles className="w-4 h-4 text-purple-400" />
+              <span>Cloud VLM Specialist (Node 3 Vision)</span>
+            </label>
+            <span className="text-[10px] font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+              Gemini ER 2 / Flash
+            </span>
+          </div>
+
+          <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
+            Eliminates edge vision hallucinations by delegating medical image analysis (X-Rays, ECGs, Lab printouts) to Cloud VLM APIs.
+          </p>
+
+          <div className="relative">
+            <Key className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+            <input
+              type="password"
+              value={apiKeyInput}
+              onChange={(e) => {
+                setApiKeyInput(e.target.value);
+                onUpdateVlmApiKey?.(e.target.value);
+              }}
+              placeholder="Paste Gemini VLM API Key (Optional)..."
+              className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-purple-500/50 font-mono"
+            />
+          </div>
+        </div>
+
+        {/* Local Gemma Synthesizer & Ollama Model List */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-300 font-mono uppercase tracking-wider">
-              Installed Ollama Vision Models
+              Local Gemma Clinical Synthesizer (Node 5)
             </span>
             <button
               onClick={fetchModels}
@@ -99,13 +136,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
 
-        {/* Model Presets Hint */}
-        <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1 font-sans">
-          <p className="font-bold text-slate-200 font-mono">Recommended Vision Models:</p>
-          <ul className="list-disc list-inside space-y-0.5 text-[11px]">
-            <li><code className="text-emerald-400">gemma4:vision</code> (Recommended Primary Vision Model)</li>
-            <li><code className="text-emerald-400">paligemma</code> / <code className="text-emerald-400">llava</code> (Lightweight Multimodal)</li>
-          </ul>
+        {/* Hybrid Architecture Summary */}
+        <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1 font-sans">
+          <p className="font-bold text-slate-200 font-mono">Hybrid Architecture Flow:</p>
+          <p className="text-[11px] leading-relaxed">
+            1. <strong>Cloud VLM</strong> extracts accurate radiologic & OCR findings from images.<br/>
+            2. <strong>Local Gemma</strong> combines VLM visual findings with vitals, 0ms lab alerts, and local RAG guidelines into a comprehensive doctor report.
+          </p>
         </div>
 
         {/* Save & Close */}

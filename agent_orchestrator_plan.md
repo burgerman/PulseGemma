@@ -1,39 +1,39 @@
 # 🤖 Local Agentic Orchestrator & Workflow Implementation Plan
-### PulseGemma: Grounded Edge-AI Clinical Triage Engine (Multimodal Vision)
+### PulseGemma: Grounded Edge-AI Clinical Triage Engine (Hybrid VLM & Local Gemma)
 
-> **"A multi-agent, event-driven local orchestration pipeline powered by a Local Tool Calling Execution Layer and a Unified Knowledge Base Data Layer, combining Multimodal Vision AI reasoning with 100% grounded deterministic safety controls."**
+> **"A multi-agent, event-driven orchestration pipeline powered by a Cloud VLM Specialist (Node 3: Gemini ER 2 / Flash) for zero-hallucination medical image analysis, a 100% Deterministic Safety Engine (Node 2) for 0ms lab math checks, and a Local Gemma Synthesizer (Node 5) for comprehensive clinical triage reports."**
 
 ---
 
 ## 🛠️ 1. Local Tool Calling Execution Layer (`src/agent/tools/*`)
 
-To make the agentic workflow robust, smart, and extensible, **PulseGemma** equips the Multimodal Vision AI Engine and sub-agent nodes with a suite of **Local Executable Tools**. Instead of relying on parametric memory or guessing, the AI engine calls local client-side tool functions deterministically.
+To make the agentic workflow robust, smart, and extensible, **PulseGemma** equips the Multimodal AI Engine and sub-agent nodes with a suite of **Local Executable Tools**. Instead of relying on parametric memory or guessing, the AI engine calls local client-side tool functions deterministically.
 
 ```
-                              ┌────────────────────────────────────────────────────────┐
-                              │    MULTIMODAL VISION REASONING & AGENT NODES           │
-                              └───────────────────────────┬────────────────────────────┘
-                                                          │
-                                                          ▼ (Function Calling / Tool Execution)
-                              ┌────────────────────────────────────────────────────────┐
-                              │            LOCAL TOOL EXECUTOR REGISTRY                │
-                              │                (src/agent/tools/index.ts)              │
-                              └───────────────────────────┬────────────────────────────┘
-                                                          │
-       ┌──────────────────────┬───────────────────────────┼───────────────────────────┬──────────────────────┐
-       ▼                      ▼                           ▼                           ▼                      ▼
-┌──────────────┐     ┌─────────────────┐         ┌──────────────────┐        ┌──────────────────┐   ┌────────────────┐
-│ Tool 1:      │     │ Tool 2:         │         │ Tool 3:          │        │ Tool 4:          │   │ Tool 5:        │
-│ Query KB     │     │ Clinical Score  │         │ Drug Interaction │        │ Age-Adjusted     │   │ FHIR Audit     │
-│ Guidelines   │     │ Calculator      │         │ & Allergy Check  │        │ Vitals Check     │   │ Logger / Export│
-└──────┬───────┘     └────────┬────────┘         └────────┬─────────┘        └────────┬─────────┘   └───────┬────────┘
-       │                      │                           │                           │                     │
-───────┴──────────────────────┴───────────────────────────┴───────────────────────────┴─────────────────────┴────────
-                                                          │
-                                                          ▼
-                              ┌────────────────────────────────────────────────────────┐
-                              │            UNIFIED KNOWLEDGE BASE DATA LAYER           │
-                              └────────────────────────────────────────────────────────┘
+                               ┌────────────────────────────────────────────────────────┐
+                               │    MULTIMODAL REASONING & AGENT NODES (1 TO 6)         │
+                               └───────────────────────────┬────────────────────────────┘
+                                                           │
+                                                           ▼ (Function Calling / Tool Execution)
+                               ┌────────────────────────────────────────────────────────┐
+                               │            LOCAL TOOL EXECUTOR REGISTRY                │
+                               │                (src/agent/tools/index.ts)              │
+                               └───────────────────────────┬────────────────────────────┘
+                                                           │
+        ┌──────────────────────┬───────────────────────────┼───────────────────────────┬──────────────────────┐
+        ▼                      ▼                           ▼                           ▼                      ▼
+ ┌──────────────┐     ┌─────────────────┐         ┌──────────────────┐        ┌──────────────────┐   ┌────────────────┐
+ │ Tool 1:      │     │ Tool 2:         │         │ Tool 3:          │        │ Tool 4:          │   │ Tool 5:        │
+ │ Query KB     │     │ Clinical Score  │         │ Drug Interaction │        │ Age-Adjusted     │   │ FHIR Audit     │
+ │ Guidelines   │     │ Calculator      │         │ & Allergy Check  │        │ Vitals Check     │   │ Logger / Export│
+ └──────┬───────┘     └────────┬────────┘         └────────┬─────────┘        └────────┬─────────┘   └───────┬────────┘
+        │                      │                           │                           │                     │
+ ───────┴──────────────────────┴───────────────────────────┴───────────────────────────┴─────────────────────┴────────
+                                                           │
+                                                           ▼
+                               ┌────────────────────────────────────────────────────────┐
+                               │            UNIFIED KNOWLEDGE BASE DATA LAYER           │
+                               └────────────────────────────────────────────────────────┘
 ```
 
 ### Registered Local Agent Tools:
@@ -49,32 +49,30 @@ To make the agentic workflow robust, smart, and extensible, **PulseGemma** equip
 
 ---
 
-## 👁️ 2. Leveraging Multimodal Vision Advanced Reasoning & Tool Calling
+## 👁️ 2. Hybrid Cloud VLM Specialist + Local Gemma Synthesizer Architecture
 
-PulseGemma maximizes **Multimodal Vision AI's high-level reasoning, image tensor parsing, complex natural language understanding (NLU), and tool calling capabilities** while enforcing strict grounding over the `UnifiedKnowledgeBase`:
+PulseGemma uses a **Hybrid Cloud VLM + Local Gemma Synthesizer Design** to eliminate vision hallucinations while preserving edge speed and data privacy:
 
 ```
                        ┌────────────────────────────────────────────────────────┐
-                       │       MULTIMODAL VISION ADVANCED REASONING ENGINES     │
+                       │     NODE 3: CLOUD VLM VISION ANALYSIS SPECIALIST       │
+                       │             (Gemini ER 2 / Flash API)                  │
+                       │ • High-accuracy radiologic OCR (X-Rays, ECGs, Labs)   │
+                       └───────────────────────────┬────────────────────────────┘
+                                                   │ (Structured Visual Findings)
+                                                   ▼
+                       ┌────────────────────────────────────────────────────────┐
+                       │     NODE 5: LOCAL GEMMA CLINICAL SYNTHESIZER           │
+                       │ • Combines VLM visual findings with patient vitals,    │
+                       │   0ms panic lab alerts, and local RAG guidelines       │
+                       │   into a comprehensive doctor report.                  │
                        └───────────────────────────┬────────────────────────────┘
                                                    │
-         ┌─────────────────────────────────────────┼─────────────────────────────────────────┐
-         ▼                                         ▼                                         ▼
-┌───────────────────────────┐           ┌───────────────────────────┐           ┌───────────────────────────┐
-│ 1. Multilingual NLU &     │           │ 2. Cross-Modal Synthesis  │           │ 3. Grounded Differential  │
-│ Symptom Normalization     │           │ (Labs + Vitals + Vision)  │           │ Diagnostic Reasoning      │
-│ • Translates 20+ languages│           │ • Synthesizes 5-sec brief │           │ • Explains clinical logic │
-│ • Maps colloquial phrases │           │ • Correlates lab anomalies│           │ • Invokes local tools     │
-│   to clinical terminology │           │   with physical symptoms  │           │   for exact calculations  │
-└────────┬──────────────────┘           └─────────────┬─────────────┘           └─────────────┬─────────────┘
-         │                                            │                                       │
-─────────┴────────────────────────────────────────────┴───────────────────────────────────────┴─────────────
-                                                   │ (Strict Grounding Barrier)
                                                    ▼
                        ┌────────────────────────────────────────────────────────┐
                        │    UNIFIED KNOWLEDGE BASE & DETERMINISTIC GUARD        │
-                       │    - All inputs/thresholds checked by 0ms TypeScript   │
-                       │    - All AI reasoning bound to retrieved CPG passages  │
+                       │    - All lab math checked by 0ms TypeScript            │
+                       │    - All recommendations bound to CPG citations        │
                        └────────────────────────────────────────────────────────┘
 ```
 
@@ -83,21 +81,6 @@ PulseGemma maximizes **Multimodal Vision AI's high-level reasoning, image tensor
 ## 🏛️ 3. Unified Knowledge Base Architecture
 
 All nodes in PulseGemma draw ground-truth context from a single, centralized data layer: the **`UnifiedKnowledgeBase`**. No node relies on isolated parametric memory for clinical thresholds.
-
-```
-                               ┌─────────────────────────────────────────┐
-                               │     UNIFIED KNOWLEDGE BASE DATA LAYER   │
-                               │        (src/knowledge/index.ts)         │
-                               └────────────────────┬────────────────────┘
-                                                    │
-         ┌──────────────────────┬───────────────────┼───────────────────┬──────────────────────┐
-         ▼                      ▼                   ▼                   ▼                      ▼
-┌──────────────────┐  ┌──────────────────┐  ┌────────────────┐  ┌─────────────────┐  ┌──────────────────┐
-│ Clinical Practice│  │ Lab Reference    │  │ ESI v4 & Risk  │  │ Drug & Allergy  │  │ Multilingual     │
-│ Guidelines (CPGs)│  │ Threshold Store  │  │ Decision Trees │  │ Interaction DB  │  │ Clinical Lexicon │
-│ (AHA, Sepsis)    │  │ (Critical Ranges)│  │ (qSOFA, Wells) │  │ (Contraindicat.)│  │ (SNOMED/UMLS)    │
-└────────┬─────────┘  └────────┬─────────┘  └───────┬────────┘  └────────┬────────┘  └────────┬─────────┘
-```
 
 ---
 
@@ -112,8 +95,8 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
         │
         ▼
   ┌────────────┐
-  │  Step 1    │ Node 1: Multilingual Multimodal Normalization
-  │            │ • Interpret language (e.g. 'es') -> Translate to English
+  │  Step 1    │ Node 1: Multilingual NLU Normalization
+  │            │ • Speech-to-text in 20+ languages -> Translate to English
   │            │ • Multimodal NLU maps colloquial phrases to SNOMED clinical concepts
   └─────┬──────┘
         │
@@ -128,9 +111,9 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
         │
         ▼
   ┌────────────┐
-  │  Step 3    │ Node 3: Gemma Multimodal Vision OCR & Radiologic Feature Agent
-  │            │ • If medical image present -> Call Ollama Vision API (gemma4:vision / llava)
-  │            │ • Extract paper lab sheet values & X-Ray visual findings
+  │  Step 3    │ Node 3: Cloud VLM Image Analysis Specialist (Gemini ER 2 / Flash)
+  │            │ • Zero-hallucination radiologic OCR (X-Rays, 12-lead ECGs, paper lab printouts)
+  │            │ • Output verified structured visual findings
   └─────┬──────┘
         │
         ▼
@@ -142,8 +125,9 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
         │
         ▼
   ┌────────────┐
-  │  Step 5    │ Node 5: Multimodal Vision Clinical Reasoning & Citation Engine
-  │            │ • Synthesizes multi-source data strictly using CPG passages
+  │  Step 5    │ Node 5: Local Gemma Multimodal Clinical Synthesizer & Report Generator
+  │            │ • Combines Node 3 VLM visual findings with Node 1 NLU, Node 2 0ms lab alerts,
+  │              and Node 4 RAG guideline passages
   │            │ • Generates 5-Second Brief + Grounded Differentials with [Citations]
   │            │ • Invoke Local Tool: tool_generate_patient_discharge_note
   └─────┬──────┘
@@ -153,7 +137,7 @@ Below is the explicit 6-step state machine sequence executed by `Orchestrator.ts
   │  Step 6    │ Node 6: Grounding Safety Validator & Audit Guardrail
   │            │ • Verify all generated citations exist in UnifiedKnowledgeBase
   │            │ • Invoke Local Tool: tool_export_fhir_triage_log
-  │            │ • Confirm zero ungrounded claims -> Emit final Decision Support Payload
+  │            │ • Confirm zero ungrounded claims -> Emit final Decision Support Payload & Copy to EHR
   └─────┬──────┘
         │
         ▼
@@ -183,7 +167,8 @@ To enable total transparency, review, and step-by-step debugging, the orchestrat
 
 ### Core Architecture Modules (`src/*`)
 - `src/knowledge/index.ts` (Unified Knowledge Base Data Layer)
-- `src/agent/Orchestrator.ts` (Master Workflow Coordinator executing Multimodal Vision pipeline)
+- `src/agent/Orchestrator.ts` (Master Workflow Coordinator executing Hybrid Cloud VLM + Local Gemma pipeline)
 - `src/agent/PipelineDebugger.ts` (Debugger Service)
 - `src/agent/nodes/node1_normalizer.ts` through `node6_safetyValidator.ts`
+- `src/services/vlmApiService.ts` (Cloud VLM API Integration Service)
 - `src/components/WorkflowDebugger.tsx` (UI Debugger Drawer)

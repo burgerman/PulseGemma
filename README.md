@@ -1,39 +1,33 @@
 # 🫀 PulseGemma
-### Grounded Edge-AI Clinical Triage & Decision-Support Assistant
+### Grounded Hybrid VLM & Local Edge-AI Clinical Triage Assistant
 
-> **"Sub-second patient history synthesis, 100% deterministic safety rules, multimodal vision scanning, hands-free voice dictation, and multilingual clinical translation—powered by local Multimodal Vision AI models on the edge."**
+> **"Sub-second patient history synthesis, 100% deterministic safety rules, hybrid Cloud VLM image analysis, hands-free voice dictation, and multilingual clinical translation—powered by local Gemma AI models on the edge."**
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-burgerman%2FPulseGemma-blue?logo=github)](https://github.com/burgerman/PulseGemma.git)
-[![Platform](https://img.shields.io/badge/Platform-Local%20Edge%20%2F%20Offline%20First-emerald)](#-multimodal-hardware--ollama-compatibility)
-[![AI Foundation](https://img.shields.io/badge/AI-Ollama%20Multimodal%20Vision-orange)](#-multimodal-vision-requirement)
-[![Safety Philosophy](https://img.shields.io/badge/Safety-Deterministic%20Safety%20First-red)](#-system-architecture)
+[![Architecture](https://img.shields.io/badge/Architecture-Hybrid%20Cloud%20VLM%20%2B%20Local%20Gemma-emerald)](#-hybrid-cloud-vlm--local-gemma-architecture)
+[![Safety Philosophy](https://img.shields.io/badge/Safety-0ms%20Deterministic%20Rules%20First-red)](#-system-architecture--6-node-dag-workflow)
+[![UI Layout](https://img.shields.io/badge/UI-Modular%20Grid%20%2F%20Single%20Focus-purple)](#-modular-ui--feature-demo-shortcuts)
 
 ---
 
-## ⚡ 30-Second Elevator Pitch
+## ⚡ 30-Second Elevator Pitch (In Plain Street English)
 
-> **"Emergency Rooms are straight-up chaotic. Nurses are drowning in paperwork, digging through clunky medical records for 10 minutes while sick patients sit in pain. On top of that, language barriers cause crazy mix-ups, and generic AI chatbots can't be trusted in medicine because they hallucinate fake numbers.**
+> **"Look, Emergency Rooms are straight-up chaotic. Nurses are drowning in paperwork, digging through clunky medical records for 10 minutes while sick patients sit in pain. On top of that, language barriers cause crazy mix-ups, and generic edge AI models can hallucinate fake numbers when reading medical images.**
 >
-> **Enter PulseGemma: a super fast, local AI assistant that actually reads X-rays, ECGs, and paper lab prints on the spot—with zero cloud latency and zero privacy leaks. In 5 seconds flat, it hands doctors a clean intake brief, flags critical panic labs with 0% guesswork, and translates voice notes in 20+ languages. No fluff, no cloud fees, just fast, safe ER triage right at the edge."**
+> **Enter PulseGemma: a smart hybrid system. It pairs a high-precision Cloud VLM Specialist (like Gemini 2.0 Flash / Gemini ER 2) to handle visual X-Ray, ECG, and lab printout scanning without hallucination, with a fast Local Gemma Model on the edge that combines those visual findings with clinical notes, vitals, 0ms lab alerts, and guideline passages. In 5 seconds flat, it hands doctors a clean, comprehensive triage report with zero model guesswork on medical math. No fluff, no cloud fees for local synthesis, just fast, safe ER triage right at the edge."**
 
 ---
 
-## 👁️ Multimodal Vision Requirement & Ollama Model Support
+## 💡 Hybrid Cloud-VLM & Local Gemma Architecture
 
-Because clinical triage involves physical artifacts (paper lab sheets, 12-lead ECG strips, and X-ray images), **pure text language models cannot handle this task**. PulseGemma requires a **Multimodal Vision AI Model** capable of processing both image tensors and text inputs.
+To eliminate edge vision hallucinations while preserving local data privacy and low latency, PulseGemma uses a **Hybrid Cloud-VLM + Local Gemma Architecture**:
 
-* **Recommended Primary Model**: `gemma4:vision` / `gemma3:vision` / `paligemma`
-* **Compatible Multimodal Alternatives**: `llava`, `llama3.2-vision`, `bakllava`
-* **Offline Edge Fallback Engine**: If Ollama is offline or latency spikes, PulseGemma engages its built-in client-side multimodal simulation engine so the entire web app runs seamlessly on any device.
-
----
-
-## 💡 Real-World ER Problems Solved
-
-1. ⏱️ **Information Overload & Triage Bottlenecks**: Replaces 10-minute EHR digging with a **5-Second Clinical Intake Brief** highlighting critical red flags (*CABG history, anticoagulants, severe allergies*).
-2. 🌐 **Language Barriers**: Accepts oral voice dictation in **20+ languages** (Spanish, Mandarin, French, Arabic), translating spoken symptoms into standardized English clinical terminology.
-3. 🖼️ **Paperwork & Visual Scan Bottlenecks**: Uses Gemma Multimodal Vision to OCR-scan physical lab printouts and highlight visual radiologic findings on Chest X-Rays and ECG strips.
-4. 🛡️ **Zero-Hallucination Medical Safety**: Pairs Multimodal Gemma with a **100% Deterministic TypeScript Engine** (for 0ms lab checks) and **Ground-Truth RAG Retrieval** over verbatim Emergency Clinical Practice Guidelines (AHA Chest Pain, Surviving Sepsis, ESI v4). Every recommendation includes clickable source citations (`[CPG-AHA-2023-ACS-4.2]`).
+1. 👁️ **Cloud VLM Specialist (Node 3: Vision Analysis)**:
+   - Uses high-accuracy Vision-Language Models (e.g., Gemini 2.0 Flash / Gemini ER 2 via API) for zero-hallucination radiologic analysis of X-Rays, 12-lead ECG strips, and printed paper lab sheets.
+2. 🤖 **Local Edge Synthesizer (Node 5: Gemma Reasoner)**:
+   - Takes the verified visual findings from Node 3, combines them locally with patient vitals, 0ms deterministic lab panic alerts, and local Grounded RAG guideline passages (`[CPG-AHA-2023]`), and generates the final comprehensive report for physician review.
+3. 🛡️ **100% Deterministic Safety Engine (Node 2: 0ms Rules)**:
+   - Never relies on an LLM for medical math. Pure TypeScript client logic evaluates panic lab limits (*Troponin I > 0.04 ng/mL, K+ > 5.5 mEq/L, Lactate > 2.0 mmol/L*), qSOFA, Wells PE, and ESI v4 triage decision trees in **0 milliseconds**.
 
 ---
 
@@ -48,43 +42,76 @@ Because clinical triage involves physical artifacts (paper lab sheets, 12-lead E
                                            ▼
  ┌────────────────────────────────────────────────────────────────────────┐
  │ 1. Multilingual NLU & Symptom Normalizer Node                          │
+ │    • Speech-to-text in 20+ languages -> SNOMED clinical concepts.     │
  └──────────────────────────────────┬─────────────────────────────────────┘
                                     │
                                     ▼
  ┌────────────────────────────────────────────────────────────────────────┐
  │ 2. 100% Deterministic Safety & Rule Engine Node (0ms TypeScript)       │
+ │    • Evaluates panic lab limits & ESI v4 decision tree (Levels 1 - 5).  │
  └──────────────────────────────────┬─────────────────────────────────────┘
                                     │
                                     ▼
  ┌────────────────────────────────────────────────────────────────────────┐
- │ 3. Gemma Multimodal Vision & Image OCR Scanner Node                    │
+ │ 3. Cloud VLM Image Analysis Specialist Node (Gemini ER 2 / Flash API) │
+ │    • Zero-hallucination radiologic OCR (X-Rays, ECGs, paper lab sheets)│
  └──────────────────────────────────┬─────────────────────────────────────┘
                                     │
                                     ▼
  ┌────────────────────────────────────────────────────────────────────────┐
  │ 4. Ground-Truth RAG Guideline Retrieval Node                           │
+ │    • Fetches verbatim CPG passages (AHA 2023, Surviving Sepsis 2021).  │
  └──────────────────────────────────┬─────────────────────────────────────┘
                                     │
                                     ▼
  ┌────────────────────────────────────────────────────────────────────────┐
- │ 5. Gemma Multimodal Clinical Reasoning Node                            │
+ │ 5. Local Gemma Multimodal Clinical Synthesizer & Report Generator Node │
+ │    • Combines VLM visual findings + clinical notes + RAG guidelines.   │
  └──────────────────────────────────┬─────────────────────────────────────┘
                                     │
                                     ▼
  ┌────────────────────────────────────────────────────────────────────────┐
  │ 6. AST Grounding Safety Guardrail & EHR Export Node                    │
+ │    • Audits citations -> Exports FHIR-compliant summary & copy to EHR. │
  └────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📄 Key Feature Specification Specifications
+## 🎛️ Modular UI & Feature Demo Shortcuts
+
+PulseGemma features a flexible **Component-Oriented UI Architecture**:
+
+* 🧩 **Modular Grid Dashboard**: Displays all active feature modules side-by-side in a multi-card clinical grid layout.
+* 🎯 **Single Focus View**: Isolates 1 feature module for deep focused task execution.
+* 🚀 **1-Click Feature Demo Shortcuts**: Header dropdown (`Feature Demos`) offering 1-click automated demo runs for:
+  1. `🎙️ 1. Voice NLU Dictation (Spanish)`
+  2. `⚡ 2. 0ms Range Checker (Troponin & K+ Panic)`
+  3. `👁️ 3. Vision OCR Scanner (12-Lead ECG & X-Ray)`
+  4. `📚 4. Grounded CPG RAG (AHA Guideline)`
+  5. `🩺 5. Master Triage Brief & EHR Copy`
+
+---
+
+## 🚀 Built-In Emergency Department Demo Test Suite
+
+PulseGemma includes 4 pre-configured clinical test scenarios in the top header bar:
+
+1. 🫀 **ACS Chest Pain (STEMI / Spanish)**: Spoken Spanish transcript, Cardiac Troponin I = `0.85 ng/mL` (PANIC), 12-lead ECG STEMI scan, ESI Level 2.
+2. 🔥 **Severe Septic Shock (Chinese)**: Spoken Chinese transcript, BP `88/54`, Lactate = `4.2 mmol/L`, qSOFA = 3, Chest X-Ray lobar pneumonia scan, ESI Level 1.
+3. ⚡ **Acute ESRD Hyperkalemia (French)**: Spoken French transcript, Serum Potassium K+ = `6.8 mEq/L` (PANIC), paper lab report photo, ESI Level 2.
+4. 🩸 **Diabetic Ketoacidosis (DKA / English)**: English transcript, Blood Glucose = `380 mg/dL`, pH `7.22`, HCO3 `12 mEq/L`, ESI Level 2.
+
+---
+
+## 📄 Feature Specification Blueprints
 
 1. 🔴 **[Deterministic Range Checker Engine](feature_deterministic_range_checker.md)**: 0ms client-side calculation of critical high/low lab thresholds.
 2. 🎙️ **[Hands-Free Voice Dictation & Symptom NLU](feature_handsfree_voice_dictation.md)**: Real-time speech-to-text in 20+ languages with structured clinical entity extraction.
 3. 📚 **[Grounded CPG RAG Retrieval Engine](feature_grounded_cpg_rag.md)**: Local RAG retrieval matching patient findings against verbatim Emergency Clinical Practice Guidelines.
 4. 🤖 **[Agentic Orchestrator Plan](agent_orchestrator_plan.md)**: Specification for the 6-Node State Machine and Local Tool Execution Registry.
 5. 📐 **[Code Structure & Standards](code_structure_and_standards.md)**: Technical architecture standards and WCAG AA accessibility specs.
+6. 🏆 **[3-Minute Pitch Script & Presentation Guide](PITCH_DEMO_SCRIPT.md)**: Complete presenter script and 4-act demo walkthrough.
 
 ---
 
@@ -100,10 +127,7 @@ cd PulseGemma
 # 2. Install dependencies
 npm install
 
-# 3. Pull & Run Ollama Multimodal Vision model locally (Optional)
-ollama run gemma4:vision  # Or: paligemma / llava
-
-# 4. Start local development server
+# 3. Start local development server
 npm run dev
 ```
 
@@ -111,4 +135,4 @@ npm run dev
 
 ## 📜 Disclaimer
 
-*PulseGemma is an experimental AI-edge tool designed strictly for research, hackathon demonstration, and clinical decision support prototyping. It does not replace professional medical judgment, diagnosis, or treatment.*
+*PulseGemma is an experimental AI tool designed strictly for research, hackathon demonstration, and clinical decision support prototyping. It does not replace professional medical judgment, diagnosis, or treatment.*

@@ -12,15 +12,18 @@ export type StateChangeListener = (state: TriageState) => void;
 /**
  * Master Agentic Orchestrator (DAG State Machine).
  * Coordinates execution of Nodes 1 to 6 and manages state lifecycle.
+ * Supports Hybrid Cloud VLM (Node 3 Vision Specialist) + Local Gemma Clinical Synthesizer (Node 5).
  */
 export class AgentOrchestrator {
   private state: TriageState;
   private listeners: StateChangeListener[] = [];
   private selectedModel: string = 'gemma4:vision';
+  private vlmApiKey?: string;
 
-  constructor(initialState: TriageState, modelName: string = 'gemma4:vision') {
+  constructor(initialState: TriageState, modelName: string = 'gemma4:vision', vlmApiKey?: string) {
     this.state = initialState;
     this.selectedModel = modelName;
+    this.vlmApiKey = vlmApiKey;
   }
 
   public subscribe(listener: StateChangeListener): () => void {
@@ -37,6 +40,10 @@ export class AgentOrchestrator {
 
   public setModel(modelName: string): void {
     this.selectedModel = modelName;
+  }
+
+  public setVlmApiKey(apiKey?: string): void {
+    this.vlmApiKey = apiKey;
   }
 
   private notify(): void {
@@ -67,9 +74,9 @@ export class AgentOrchestrator {
         return res;
       });
 
-      // Node 3: Gemma Multimodal Vision OCR & Scanning
-      await this.runStep('VISION_PARSING', 'node3_visionAgent', 'Gemma Vision Feature OCR', async () => {
-        const res = await executeNode3_VisionAgent(this.state.inputs.image);
+      // Node 3: Cloud VLM Vision Analysis & OCR Specialist (Gemini 2.0 Flash / Gemini ER via API)
+      await this.runStep('VISION_PARSING', 'node3_visionAgent', 'Cloud VLM Image Analysis', async () => {
+        const res = await executeNode3_VisionAgent(this.state.inputs.image, this.vlmApiKey);
         this.state = { ...this.state, node3_visionResults: res };
         return res;
       });
@@ -86,8 +93,9 @@ export class AgentOrchestrator {
         return res;
       });
 
-      // Node 5: Gemma Multimodal Clinical Reasoner
-      await this.runStep('REASONING', 'node5_gemmaReasoner', 'Gemma Clinical Reasoning', async () => {
+      // Node 5: Local Gemma Multimodal Clinical Synthesizer
+      // Combines VLM visual findings with patient notes, vitals, panic labs & RAG passages into comprehensive report
+      await this.runStep('REASONING', 'node5_gemmaReasoner', 'Gemma Report Synthesizer', async () => {
         const res = await executeNode5_GemmaReasoner(
           this.state.patientProfile,
           this.state.node1_normalizedSymptoms?.chiefComplaint || 'Chest Pain',
