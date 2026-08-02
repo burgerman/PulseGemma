@@ -6,10 +6,10 @@
   --color-esi-4: #2563EB; /* Less Urgent - Blue 600 */
   --color-esi-5: #059669; /* Non-Urgent - Emerald 600 */
 
-  --color-critical-bg: rgba(220, 38, 38, 0.15);
-  --color-critical-border: rgba(220, 38, 38, 0.4);
-  --color-warning-bg: rgba(217, 119, 6, 0.15);
-  --color-warning-border: rgba(217, 119, 6, 0.4);
-  --color-normal-bg: rgba(5, 150, 105, 0.15);
-  --color-normal-border: rgba(5, 150, 105, 0.4);
+  --color-critical-bg: #fee2e2;
+  --color-critical-border: #f87171;
+  --color-warning-bg: #fef3c7;
+  --color-warning-border: #fbbf24;
+  --color-normal-bg: #d1fae5;
+  --color-normal-border: #34d399;
 }

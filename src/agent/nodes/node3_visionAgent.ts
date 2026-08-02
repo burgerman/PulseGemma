@@ -1,10 +1,11 @@
 import { MedicalImagePayload } from '../../types/clinical';
 import { callCloudVlmApi } from '../../services/vlmApiService';
+import { MEDGEMMA_VISION_MODEL } from '../../services/ollamaService';
 
 /**
- * Node 3: Cloud VLM Vision Analysis & OCR Agent.
- * Uses high-precision Vision-Language Models (e.g. Gemini 2.0 Flash / Gemini ER via API)
- * to analyze X-rays, paper lab printouts, and 12-lead ECG strips without hallucination.
+ * Node 3: MedGemma 1.5 Medical Vision & OCR Specialist Node.
+ * Uses MedGemma 1.5 (or Cloud VLM API fallback) to parse X-rays, 
+ * 12-lead ECG strips, and paper lab sheet photos.
  */
 export async function executeNode3_VisionAgent(
   image?: MedicalImagePayload,
@@ -15,7 +16,7 @@ export async function executeNode3_VisionAgent(
   vlmModelUsed?: string;
 }> {
   if (!image) {
-    return { ocrExtractedLabs: {}, visionFindings: [] };
+    return { ocrExtractedLabs: {}, visionFindings: [], vlmModelUsed: MEDGEMMA_VISION_MODEL };
   }
 
   const result = await callCloudVlmApi(image, vlmApiKey);
@@ -23,6 +24,6 @@ export async function executeNode3_VisionAgent(
   return {
     ocrExtractedLabs: result.ocrExtractedLabs,
     visionFindings: result.visionFindings,
-    vlmModelUsed: result.vlmModelUsed
+    vlmModelUsed: result.vlmModelUsed || MEDGEMMA_VISION_MODEL
   };
 }

@@ -28,6 +28,7 @@ export interface ExtractedSymptomEntity {
   readonly associatedSymptoms: readonly string[];
   readonly detectedLanguage: string;
   readonly translatedEnglishSummary: string;
+  readonly doctorQuickSummary?: string;
 }
 
 export interface GuidelinePassage {

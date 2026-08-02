@@ -1,10 +1,10 @@
 import { GuidelinePassage } from '../../types/agent';
 import { EvaluatedLabResult, DifferentialDiagnosis, RecommendedOrder, PatientProfile } from '../../types/clinical';
-import { callOllamaFlexible } from '../../services/ollamaService';
+import { callOllamaFlexible, GEMMA_4_NLU_MODEL } from '../../services/ollamaService';
 
 /**
- * Node 5: Local Gemma Multimodal Clinical Synthesizer & Report Generator.
- * Combines verified VLM visual findings (from Node 3) with patient notes, 
+ * Node 5: Local Gemma 4 12B Multimodal Clinical Synthesizer & Report Generator.
+ * Combines verified VLM visual findings (from MedGemma 1.5 in Node 3) with patient notes, 
  * 0ms deterministic panic lab alerts, and Grounded RAG guidelines [CitationId]
  * to generate a comprehensive clinical report for physician review and diagnosis.
  */
@@ -14,7 +14,7 @@ export async function executeNode5_GemmaReasoner(
   labAlerts: readonly EvaluatedLabResult[],
   retrievedGuidelines: readonly GuidelinePassage[],
   visionFindings: readonly string[] = [],
-  selectedModel: string = 'gemma4:vision'
+  selectedModel: string = GEMMA_4_NLU_MODEL
 ): Promise<{
   fiveSecondIntakeBrief: string[];
   keyRedFlags: string[];

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Header, FeatureTabKey, ViewLayoutMode } from './components/Header';
+import { Header, FeatureTabKey } from './components/Header';
+import { PatientOverviewCard } from './components/PatientOverviewCard';
 import { VoiceDictationTab } from './components/tabs/VoiceDictationTab';
 import { DeterministicLabTab } from './components/tabs/DeterministicLabTab';
 import { MultimodalVisionTab } from './components/tabs/MultimodalVisionTab';
@@ -15,22 +16,13 @@ import { createInitialState } from './agent/state';
 import { AgentOrchestrator } from './agent/Orchestrator';
 import { TriageState } from './types/agent';
 import { PatientVitals, MedicalImagePayload } from './types/clinical';
+import { Volume2, Eye, TestTube2, BookOpen, Stethoscope } from 'lucide-react';
 
 export function App() {
   const [selectedCase, setSelectedCase] = useState<PresetEmergencyCase>(PRESET_EMERGENCY_CASES[0]);
-  const [selectedModel, setSelectedModel] = useState<string>('gemma4:vision');
+  const [selectedModel, setSelectedModel] = useState<string>('hf.co/unsloth/medgemma-1.5-4b-it-GGUF:Q8_0');
   const [vlmApiKey, setVlmApiKey] = useState<string>('');
   const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabKey>('TRIAGE_SYNTHESIS');
-  const [layoutMode, setLayoutMode] = useState<ViewLayoutMode>('MODULAR_GRID');
-  
-  // Modular Module Visibility Map
-  const [visibleModules, setVisibleModules] = useState<Record<FeatureTabKey, boolean>>({
-    VOICE_DICTATION: true,
-    DETERMINISTIC_LABS: true,
-    MULTIMODAL_VISION: true,
-    GROUNDED_RAG: true,
-    TRIAGE_SYNTHESIS: true
-  });
 
   // Interactive Patient State Inputs
   const [rawTranscript, setRawTranscript] = useState<string>(selectedCase.rawTranscript);
@@ -77,14 +69,6 @@ export function App() {
     setTriageState(newState);
   };
 
-  // Toggle Module Visibility
-  const handleToggleModuleVisibility = (key: FeatureTabKey) => {
-    setVisibleModules(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
   // Update Lab Value
   const handleUpdateLabValue = (testId: string, val: number) => {
     const updatedLabs = { ...rawLabs, [testId]: val };
@@ -96,7 +80,7 @@ export function App() {
     setUploadedImage(img);
   };
 
-  // Run Triage Pipeline (Hybrid Cloud VLM Node 3 + Local Gemma Node 5)
+  // Run Triage Pipeline
   const handleRunTriage = async () => {
     setIsPipelineRunning(true);
     const stateInput = createInitialState(
@@ -114,248 +98,166 @@ export function App() {
     setIsPipelineRunning(false);
   };
 
-  // Quick Automated Demo Run Trigger for Specific Key Feature
-  const handleQuickDemoRun = async (targetFeature?: FeatureTabKey) => {
-    let demoCase = PRESET_EMERGENCY_CASES[0]; // Default: ACS STEMI
-    if (targetFeature === 'VOICE_DICTATION') {
-      demoCase = PRESET_EMERGENCY_CASES[0];
-    } else if (targetFeature === 'DETERMINISTIC_LABS') {
-      demoCase = PRESET_EMERGENCY_CASES[2];
-    } else if (targetFeature === 'MULTIMODAL_VISION') {
-      demoCase = PRESET_EMERGENCY_CASES[1];
-    } else if (targetFeature === 'GROUNDED_RAG') {
-      demoCase = PRESET_EMERGENCY_CASES[0];
-    } else if (targetFeature === 'TRIAGE_SYNTHESIS') {
-      demoCase = PRESET_EMERGENCY_CASES[0];
-    }
-
-    setSelectedCase(demoCase);
-    setRawTranscript(demoCase.rawTranscript);
-    setInputLanguage(demoCase.inputLanguage);
-    setVitals(demoCase.vitals);
-    setRawLabs(demoCase.rawLabs);
-    setUploadedImage(demoCase.image);
-
-    if (targetFeature) {
-      setLayoutMode('SINGLE_FOCUS');
-      setActiveFeatureTab(targetFeature);
-    }
-
-    setIsPipelineRunning(true);
-    const stateInput = createInitialState(
-      demoCase.patientProfile,
-      demoCase.vitals,
-      demoCase.rawLabs,
-      demoCase.rawTranscript,
-      demoCase.inputLanguage,
-      demoCase.image
-    );
-
-    const orchestrator = new AgentOrchestrator(stateInput, selectedModel, vlmApiKey);
-    orchestrator.subscribe((state) => setTriageState(state));
-    await orchestrator.runPipeline();
-    setIsPipelineRunning(false);
-  };
-
-  // Auto-run triage on initial launch
+  // Auto-run triage on initial launch or case change
   useEffect(() => {
     handleRunTriage();
   }, [selectedCase]);
 
   const activeImage = uploadedImage || selectedCase.image;
 
+  const TABS = [
+    { key: 'TRIAGE_SYNTHESIS' as FeatureTabKey, label: 'Master Triage', icon: Stethoscope },
+    { key: 'VOICE_DICTATION' as FeatureTabKey, label: 'Voice Dictation', icon: Volume2 },
+    { key: 'MULTIMODAL_VISION' as FeatureTabKey, label: 'Medical Vision', icon: Eye },
+    { key: 'DETERMINISTIC_LABS' as FeatureTabKey, label: 'Lab Rules', icon: TestTube2 },
+    { key: 'GROUNDED_RAG' as FeatureTabKey, label: 'Guidelines RAG', icon: BookOpen }
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-rose-500 selection:text-white font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
       
-      {/* Header Bar with Quick Feature Demo Actions */}
+      {/* Top Header */}
       <Header
         calculatedESI={triageState.node2_deterministicResults?.calculatedESI}
         selectedCaseId={selectedCase.id}
         selectedModel={selectedModel}
         isPipelineRunning={isPipelineRunning}
-        activeFeatureTab={activeFeatureTab}
-        layoutMode={layoutMode}
-        visibleModules={visibleModules}
-        onSelectFeatureTab={setActiveFeatureTab}
-        onChangeLayoutMode={setLayoutMode}
-        onToggleModuleVisibility={handleToggleModuleVisibility}
-        onSelectCase={handleSelectCase}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenDebugger={() => setIsDebuggerOpen(true)}
         onRunTriage={handleRunTriage}
-        onQuickDemoRun={handleQuickDemoRun}
       />
 
-      {/* Main Workspace Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+      {/* Main Workspace (Clean 2-Column Dashboard) */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
         
-        {/* MODULAR GRID MODE: All Active Feature Modules Arranged in Grid Cards */}
-        {layoutMode === 'MODULAR_GRID' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          
+          {/* Left Column: Patient Context Sidebar (3/12 cols) */}
+          <div className="lg:col-span-4 space-y-6">
+            <PatientOverviewCard
+              patientProfile={selectedCase.patientProfile}
+              vitals={vitals}
+              esiResult={triageState.node2_deterministicResults?.calculatedESI}
+              selectedCaseId={selectedCase.id}
+              onSelectCase={handleSelectCase}
+            />
+          </div>
+
+          {/* Right Column: Main Interactive Workspace (8/12 cols) */}
+          <div className="lg:col-span-8 space-y-6">
             
-            {/* Left Column: Intake, Range Checker & Vision (Width 7/12) */}
-            <div className="lg:col-span-7 space-y-6">
-              
-              {/* Module 1: Voice Dictation */}
-              {visibleModules.VOICE_DICTATION && (
-                <div className="relative">
-                  <VoiceDictationTab
-                    patientProfile={selectedCase.patientProfile}
-                    rawTranscript={rawTranscript}
-                    inputLanguage={inputLanguage}
-                    normalizedSymptoms={triageState.node1_normalizedSymptoms}
-                    onUpdateTranscript={setRawTranscript}
-                    onUpdateLanguage={setInputLanguage}
-                  />
-                </div>
-              )}
-
-              {/* Module 2: Range Checker */}
-              {visibleModules.DETERMINISTIC_LABS && (
-                <div className="relative">
-                  <DeterministicLabTab
-                    vitals={vitals}
-                    labAlerts={triageState.node2_deterministicResults?.labAlerts || []}
-                    esiResult={triageState.node2_deterministicResults?.calculatedESI}
-                    qSofaScore={triageState.node2_deterministicResults?.qSofaScore || 0}
-                    wellsScore={triageState.node2_deterministicResults?.wellsScore || 0}
-                    drugAlerts={triageState.node2_deterministicResults?.drugInteractionAlerts || []}
-                    onUpdateVitals={setVitals}
-                    onUpdateLabValue={handleUpdateLabValue}
-                  />
-                </div>
-              )}
-
-              {/* Module 3: Multimodal Vision */}
-              {visibleModules.MULTIMODAL_VISION && (
-                <div className="relative">
-                  <MultimodalVisionTab
-                    image={activeImage}
-                    visionFindings={triageState.node3_visionResults?.visionFindings || []}
-                    onUploadImage={handleUploadImage}
-                  />
-                </div>
-              )}
-
+            {/* Explicit Feature Tab Bar Navigation */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-1.5 shadow-sm flex items-center gap-1 overflow-x-auto scrollbar-none">
+              {TABS.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeFeatureTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveFeatureTab(tab.key)}
+                    className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold font-sans transition shrink-0 cursor-pointer ${
+                      isActive
+                        ? 'bg-teal-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Right Column: Master Triage Brief & Grounded RAG (Width 5/12) */}
-            <div className="lg:col-span-5 space-y-6">
-              
-              {/* Module 5: Master Triage Brief */}
-              {visibleModules.TRIAGE_SYNTHESIS && (
-                <div className="relative">
-                  <MasterTriageSynthesisTab
-                    intakeBrief={triageState.node5_gemmaSynthesis?.fiveSecondIntakeBrief || []}
-                    redFlags={triageState.node5_gemmaSynthesis?.keyRedFlags || []}
-                    differentials={triageState.node5_gemmaSynthesis?.differentials || []}
-                    recommendedOrders={triageState.node5_gemmaSynthesis?.recommendedOrders || []}
-                    dischargeNote={triageState.node5_gemmaSynthesis?.patientDischargeNote || ''}
-                    isGrounded={triageState.node6_validationState?.isGrounded ?? true}
-                    esiResult={triageState.node2_deterministicResults?.calculatedESI}
-                    onOpenEvidence={(cid) => setActiveEvidenceCitation(cid)}
-                  />
-                </div>
+            {/* Active Workspace View */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              {activeFeatureTab === 'VOICE_DICTATION' && (
+                <VoiceDictationTab
+                  patientProfile={selectedCase.patientProfile}
+                  rawTranscript={rawTranscript}
+                  inputLanguage={inputLanguage}
+                  normalizedSymptoms={triageState.node1_normalizedSymptoms}
+                  onUpdateTranscript={setRawTranscript}
+                  onUpdateLanguage={setInputLanguage}
+                  onProcessTranscript={handleRunTriage}
+                />
               )}
 
-              {/* Module 4: Grounded RAG */}
-              {visibleModules.GROUNDED_RAG && (
-                <div className="relative">
-                  <GroundedRAGTab
-                    retrievedGuidelines={triageState.node4_retrievedGuidelines || []}
-                    onOpenEvidenceModal={(cid) => setActiveEvidenceCitation(cid)}
-                  />
-                </div>
+              {activeFeatureTab === 'DETERMINISTIC_LABS' && (
+                <DeterministicLabTab
+                  vitals={vitals}
+                  labAlerts={triageState.node2_deterministicResults?.labAlerts || []}
+                  esiResult={triageState.node2_deterministicResults?.calculatedESI}
+                  qSofaScore={triageState.node2_deterministicResults?.qSofaScore || 0}
+                  wellsScore={triageState.node2_deterministicResults?.wellsScore || 0}
+                  drugAlerts={triageState.node2_deterministicResults?.drugInteractionAlerts || []}
+                  onUpdateVitals={setVitals}
+                  onUpdateLabValue={handleUpdateLabValue}
+                />
               )}
 
+              {activeFeatureTab === 'MULTIMODAL_VISION' && (
+                <MultimodalVisionTab
+                  image={activeImage}
+                  visionFindings={triageState.node3_visionResults?.visionFindings || []}
+                  onUploadImage={handleUploadImage}
+                />
+              )}
+
+              {activeFeatureTab === 'GROUNDED_RAG' && (
+                <GroundedRAGTab
+                  retrievedGuidelines={triageState.node4_retrievedGuidelines || []}
+                  onOpenEvidenceModal={(cid) => setActiveEvidenceCitation(cid)}
+                />
+              )}
+
+              {activeFeatureTab === 'TRIAGE_SYNTHESIS' && (
+                <MasterTriageSynthesisTab
+                  intakeBrief={triageState.node5_gemmaSynthesis?.fiveSecondIntakeBrief || []}
+                  redFlags={triageState.node5_gemmaSynthesis?.keyRedFlags || []}
+                  differentials={triageState.node5_gemmaSynthesis?.differentials || []}
+                  recommendedOrders={triageState.node5_gemmaSynthesis?.recommendedOrders || []}
+                  dischargeNote={triageState.node5_gemmaSynthesis?.patientDischargeNote || ''}
+                  isGrounded={triageState.node6_validationState?.isGrounded ?? true}
+                  esiResult={triageState.node2_deterministicResults?.calculatedESI}
+                  onOpenEvidence={(cid) => setActiveEvidenceCitation(cid)}
+                />
+              )}
             </div>
 
           </div>
-        ) : (
-          /* SINGLE FOCUS MODE: View 1 Isolated Feature Tab */
-          <div>
-            {activeFeatureTab === 'VOICE_DICTATION' && (
-              <VoiceDictationTab
-                patientProfile={selectedCase.patientProfile}
-                rawTranscript={rawTranscript}
-                inputLanguage={inputLanguage}
-                normalizedSymptoms={triageState.node1_normalizedSymptoms}
-                onUpdateTranscript={setRawTranscript}
-                onUpdateLanguage={setInputLanguage}
-              />
-            )}
 
-            {activeFeatureTab === 'DETERMINISTIC_LABS' && (
-              <DeterministicLabTab
-                vitals={vitals}
-                labAlerts={triageState.node2_deterministicResults?.labAlerts || []}
-                esiResult={triageState.node2_deterministicResults?.calculatedESI}
-                qSofaScore={triageState.node2_deterministicResults?.qSofaScore || 0}
-                wellsScore={triageState.node2_deterministicResults?.wellsScore || 0}
-                drugAlerts={triageState.node2_deterministicResults?.drugInteractionAlerts || []}
-                onUpdateVitals={setVitals}
-                onUpdateLabValue={handleUpdateLabValue}
-              />
-            )}
-
-            {activeFeatureTab === 'MULTIMODAL_VISION' && (
-              <MultimodalVisionTab
-                image={activeImage}
-                visionFindings={triageState.node3_visionResults?.visionFindings || []}
-                onUploadImage={handleUploadImage}
-              />
-            )}
-
-            {activeFeatureTab === 'GROUNDED_RAG' && (
-              <GroundedRAGTab
-                retrievedGuidelines={triageState.node4_retrievedGuidelines || []}
-                onOpenEvidenceModal={(cid) => setActiveEvidenceCitation(cid)}
-              />
-            )}
-
-            {activeFeatureTab === 'TRIAGE_SYNTHESIS' && (
-              <MasterTriageSynthesisTab
-                intakeBrief={triageState.node5_gemmaSynthesis?.fiveSecondIntakeBrief || []}
-                redFlags={triageState.node5_gemmaSynthesis?.keyRedFlags || []}
-                differentials={triageState.node5_gemmaSynthesis?.differentials || []}
-                recommendedOrders={triageState.node5_gemmaSynthesis?.recommendedOrders || []}
-                dischargeNote={triageState.node5_gemmaSynthesis?.patientDischargeNote || ''}
-                isGrounded={triageState.node6_validationState?.isGrounded ?? true}
-                esiResult={triageState.node2_deterministicResults?.calculatedESI}
-                onOpenEvidence={(cid) => setActiveEvidenceCitation(cid)}
-              />
-            )}
-          </div>
-        )}
+        </div>
 
       </main>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 border-t border-slate-800 py-3 text-center text-xs text-slate-500 font-mono">
-        PulseGemma CDS Engine • Hybrid Cloud VLM + Local Gemma Synthesizer • 100% Offline Capable
+      {/* Footer Status */}
+      <footer className="bg-white border-t border-slate-200 py-3 px-6 text-center text-xs text-slate-400 font-sans">
+        PulseGemma CDS Engine • MedGemma 1.5 Edge Mode Enabled • 100% Offline Capable
       </footer>
 
-      {/* Evidence Viewer Modal */}
-      <GroundTruthEvidenceViewer
-        citationId={activeEvidenceCitation}
-        onClose={() => setActiveEvidenceCitation(null)}
-      />
+      {/* Citation Modal */}
+      {activeEvidenceCitation && (
+        <GroundTruthEvidenceViewer
+          citationId={activeEvidenceCitation}
+          onClose={() => setActiveEvidenceCitation(null)}
+        />
+      )}
 
-      {/* Trace Debugger Drawer */}
+      {/* Telemetry Debugger Modal */}
       <WorkflowDebugger
         isOpen={isDebuggerOpen}
-        traceLog={triageState.traceLog}
         onClose={() => setIsDebuggerOpen(false)}
+        traceLog={triageState.traceLog}
       />
 
-      {/* Settings Modal */}
+      {/* System Settings Modal */}
       <SettingsModal
         isOpen={isSettingsOpen}
-        selectedModel={selectedModel}
-        vlmApiKey={vlmApiKey}
-        onSelectModel={setSelectedModel}
-        onUpdateVlmApiKey={setVlmApiKey}
         onClose={() => setIsSettingsOpen(false)}
+        selectedModel={selectedModel}
+        onSelectModel={setSelectedModel}
+        vlmApiKey={vlmApiKey}
+        onUpdateVlmApiKey={setVlmApiKey}
       />
 
     </div>
