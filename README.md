@@ -12,7 +12,7 @@
 
 ## ⚡ 30-Second Elevator Pitch (In Plain Street English)
 
-> **"Look, Emergency Rooms are straight-up chaotic. Nurses are drowning in paperwork, digging through clunky medical records for 10 minutes while sick patients sit in pain. On top of that, language barriers cause crazy mix-ups, and generic AI chatbots can't be trusted in medicine because they hallucinate fake numbers.**
+> **"Emergency Rooms are straight-up chaotic. Nurses are drowning in paperwork, digging through clunky medical records for 10 minutes while sick patients sit in pain. On top of that, language barriers cause crazy mix-ups, and generic AI chatbots can't be trusted in medicine because they hallucinate fake numbers.**
 >
 > **Enter PulseGemma: a super fast, local AI assistant that actually reads X-rays, ECGs, and paper lab prints on the spot—with zero cloud latency and zero privacy leaks. In 5 seconds flat, it hands doctors a clean intake brief, flags critical panic labs with 0% guesswork, and translates voice notes in 20+ languages. No fluff, no cloud fees, just fast, safe ER triage right at the edge."**
 
