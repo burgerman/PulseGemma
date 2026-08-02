@@ -10,11 +10,11 @@
 
 ---
 
-## ⚡ 30-Second Elevator Pitch (In Plain Street English)
+## ⚡ Project Description
 
-> **"Look, Emergency Rooms are straight-up chaotic. Nurses are drowning in paperwork, digging through clunky medical records for 10 minutes while sick patients sit in pain. On top of that, language barriers cause crazy mix-ups, and generic edge AI models can hallucinate fake numbers when reading medical images.**
+> **"Emergency Rooms are straight-up chaotic, and overcrowding right here in Ontario. Nurses are drowning in paperwork, digging through clunky medical records for 10 minutes while sick patients sit in pain. On top of that, language barriers cause crazy mix-ups, and generic edge AI models can hallucinate fake numbers when reading medical images.**
 >
-> **Enter PulseGemma: a smart hybrid system. It pairs a high-precision Cloud VLM Specialist (like Gemini 2.0 Flash / Gemini ER 2) to handle visual X-Ray, ECG, and lab printout scanning without hallucination, with a fast Local Gemma Model on the edge that combines those visual findings with clinical notes, vitals, 0ms lab alerts, and guideline passages. In 5 seconds flat, it hands doctors a clean, comprehensive triage report with zero model guesswork on medical math. No fluff, no cloud fees for local synthesis, just fast, safe ER triage right at the edge."**
+> **Enter PulseGemma: a smart hybrid system. It pairs a high-precision Cloud VLM Specialist (like Gemini 3.6 Flash / Gemini Robotics ER 2) to handle visual X-Ray, ECG, and lab printout scanning without hallucination, with a fast Local Gemma Model on the edge that combines those visual findings with clinical notes, vitals, 0ms lab alerts, and guideline passages. In 5 seconds flat, it hands doctors a clean, comprehensive triage report with zero model guesswork on medical math. No fluff, no cloud fees for local synthesis, just fast, safe ER triage right at the edge."**
 
 ---
 
@@ -23,7 +23,7 @@
 To eliminate edge vision hallucinations while preserving local data privacy and low latency, PulseGemma uses a **Hybrid Cloud-VLM + Local Gemma Architecture**:
 
 1. 👁️ **Cloud VLM Specialist (Node 3: Vision Analysis)**:
-   - Uses high-accuracy Vision-Language Models (e.g., Gemini 2.0 Flash / Gemini ER 2 via API) for zero-hallucination radiologic analysis of X-Rays, 12-lead ECG strips, and printed paper lab sheets.
+   - Uses high-accuracy Vision-Language Models (e.g., Gemini 3.6 Flash / Gemini Robotics ER 2 via API) for zero-hallucination radiologic analysis of X-Rays, 12-lead ECG strips, and printed paper lab sheets.
 2. 🤖 **Local Edge Synthesizer (Node 5: Gemma Reasoner)**:
    - Takes the verified visual findings from Node 3, combines them locally with patient vitals, 0ms deterministic lab panic alerts, and local Grounded RAG guideline passages (`[CPG-AHA-2023]`), and generates the final comprehensive report for physician review.
 3. 🛡️ **100% Deterministic Safety Engine (Node 2: 0ms Rules)**:
