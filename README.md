@@ -1,4 +1,8 @@
-# 🫀 PulseGemma
+<p align="left">
+  <img src="public/PulseGemma.png" alt="PulseGemma Logo" width="120" />
+</p>
+
+# PulseGemma
 
 ### Edge AI Clinical Decision Support Engine
 **Powered by Local Gemma 4 (NLU & Reasoning) and MedGemma 1.5 (Medical Vision)**

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Settings, Bug, Stethoscope, RefreshCw } from 'lucide-react';
+import { ShieldCheck, Settings, Bug, RefreshCw } from 'lucide-react';
 import { ESICalculationResult } from '../types/clinical';
 
 export type FeatureTabKey = 'VOICE_DICTATION' | 'DETERMINISTIC_LABS' | 'MULTIMODAL_VISION' | 'GROUNDED_RAG' | 'TRIAGE_SYNTHESIS';
@@ -25,14 +25,16 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="bg-white border-b border-slate-200 sticky top-0 z-40 px-6 py-3 shadow-xs">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* Left: Clean Logo & Title */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold shadow-xs">
-            <Stethoscope className="w-4 h-4" />
-          </div>
+        {/* Left: Brand Identity & Logo */}
+        <div className="flex items-center gap-3">
+          <img 
+            src="/PulseGemma.png" 
+            alt="PulseGemma Logo" 
+            className="h-8 w-auto object-contain" 
+          />
           <div className="flex items-center gap-2">
             <h1 className="text-base font-bold text-slate-800 font-sans tracking-tight">PulseGemma</h1>
-            <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+            <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-50 text-teal-700 border border-teal-200">
               Triage
             </span>
           </div>
@@ -91,5 +93,3 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
-
-
