@@ -10,7 +10,7 @@
 
 ---
 
-## ⚡ 30-Second Elevator Pitch (In Plain Street English)
+## ⚡ 30-Second Elevator Pitch
 
 > **"Emergency Rooms are straight-up chaotic. Nurses are drowning in paperwork, digging through clunky medical records for 10 minutes while sick patients sit in pain. On top of that, language barriers cause crazy mix-ups, and generic AI chatbots can't be trusted in medicine because they hallucinate fake numbers.**
 >
