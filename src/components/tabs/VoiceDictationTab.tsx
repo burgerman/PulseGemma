@@ -37,13 +37,6 @@ export const VoiceDictationTab: React.FC<VoiceDictationTabProps> = ({
     if (isRecording) {
       webSpeechService.stopListening();
       setIsRecording(false);
-      if (onProcessTranscript) {
-        setIsProcessing(true);
-        setTimeout(() => {
-          onProcessTranscript();
-          setIsProcessing(false);
-        }, 300);
-      }
     } else {
       webSpeechService.startListening({
         language: inputLanguage === 'es' ? 'es-ES' : inputLanguage === 'zh' ? 'zh-CN' : inputLanguage === 'fr' ? 'fr-FR' : 'en-US',
@@ -58,11 +51,14 @@ export const VoiceDictationTab: React.FC<VoiceDictationTabProps> = ({
     }
   };
 
-  const handleManualProcess = () => {
-    if (onProcessTranscript) {
+  const handleManualProcess = async () => {
+    if (onProcessTranscript && rawTranscript.trim()) {
       setIsProcessing(true);
-      onProcessTranscript();
-      setTimeout(() => setIsProcessing(false), 400);
+      try {
+        await onProcessTranscript();
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -113,7 +109,6 @@ export const VoiceDictationTab: React.FC<VoiceDictationTabProps> = ({
                   onClick={() => { 
                     onUpdateLanguage(qp.lang); 
                     onUpdateTranscript(qp.text); 
-                    if (onProcessTranscript) setTimeout(onProcessTranscript, 200);
                   }}
                   className="px-2 py-0.5 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 shrink-0 transition cursor-pointer text-xs font-medium"
                 >

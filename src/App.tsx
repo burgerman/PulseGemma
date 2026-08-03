@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Header, FeatureTabKey } from './components/Header';
 import { PatientOverviewCard } from './components/PatientOverviewCard';
 import { VoiceDictationTab } from './components/tabs/VoiceDictationTab';
@@ -16,11 +16,13 @@ import { createInitialState } from './agent/state';
 import { AgentOrchestrator } from './agent/Orchestrator';
 import { TriageState } from './types/agent';
 import { PatientVitals, MedicalImagePayload } from './types/clinical';
+import { GEMMA_4_NLU_MODEL } from './services/ollamaService';
+import { executeNode1_Normalizer } from './agent/nodes/node1_normalizer';
 import { Volume2, Eye, TestTube2, BookOpen, Stethoscope } from 'lucide-react';
 
 export function App() {
   const [selectedCase, setSelectedCase] = useState<PresetEmergencyCase>(PRESET_EMERGENCY_CASES[0]);
-  const [selectedModel, setSelectedModel] = useState<string>('hf.co/unsloth/medgemma-1.5-4b-it-GGUF:Q8_0');
+  const [selectedModel, setSelectedModel] = useState<string>(GEMMA_4_NLU_MODEL);
   const [vlmApiKey, setVlmApiKey] = useState<string>('');
   const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabKey>('TRIAGE_SYNTHESIS');
 
@@ -80,7 +82,18 @@ export function App() {
     setUploadedImage(img);
   };
 
-  // Run Triage Pipeline
+  // Doctor explicit trigger for Voice Dictation NLU (Node 1)
+  const handleProcessDictationOnly = async () => {
+    setIsPipelineRunning(true);
+    const res = await executeNode1_Normalizer(rawTranscript, inputLanguage, selectedModel);
+    setTriageState(prev => ({
+      ...prev,
+      node1_normalizedSymptoms: res
+    }));
+    setIsPipelineRunning(false);
+  };
+
+  // Run Full Triage Pipeline
   const handleRunTriage = async () => {
     setIsPipelineRunning(true);
     const stateInput = createInitialState(
@@ -98,10 +111,7 @@ export function App() {
     setIsPipelineRunning(false);
   };
 
-  // Auto-run triage on initial launch or case change
-  useEffect(() => {
-    handleRunTriage();
-  }, [selectedCase]);
+
 
   const activeImage = uploadedImage || selectedCase.image;
 
@@ -178,7 +188,7 @@ export function App() {
                   normalizedSymptoms={triageState.node1_normalizedSymptoms}
                   onUpdateTranscript={setRawTranscript}
                   onUpdateLanguage={setInputLanguage}
-                  onProcessTranscript={handleRunTriage}
+                  onProcessTranscript={handleProcessDictationOnly}
                 />
               )}
 

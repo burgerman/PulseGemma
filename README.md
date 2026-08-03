@@ -22,7 +22,7 @@ Emergency Departments face severe overcrowding, documentation overhead, and lang
 
 **PulseGemma** solves these challenges on the edge using a specialized dual-model architecture:
 
-- **`Gemma 4 12B` (`gemma4:12b`)**: Handles multilingual voice dictation NLU, symptom entity extraction, clinical practice guideline RAG, and master triage brief synthesis.
+- **`Gemma 4 12B MTP` (`4skl/gemma4-12b-mtp`)**: Accelerated multi-token prediction model for multilingual voice dictation NLU, symptom entity extraction, clinical practice guideline RAG, and master triage brief synthesis.
 - **`MedGemma 1.5` (`hf.co/unsloth/medgemma-1.5-4b-it-GGUF:Q8_0`)**: Interprets medical imagery including chest X-rays, 12-lead ECG strips, and paper lab printouts.
 - **0ms Deterministic Safety Engine**: Evaluates panic lab limits and the ESI v4 decision tree in pure client code with zero model guesswork.
 
@@ -33,8 +33,8 @@ Emergency Departments face severe overcrowding, documentation overhead, and lang
 PulseGemma runs fully offline via local Ollama endpoints (`http://localhost:11434`):
 
 ```bash
-# 1. Pull & Run Gemma 4 12B for Speech NLU, Translation & Synthesis
-ollama run gemma4:12b
+# 1. Pull & Run Accelerated Gemma 4 12B MTP for Speech NLU, Translation & Synthesis
+ollama run 4skl/gemma4-12b-mtp
 
 # 2. Pull & Run MedGemma 1.5 for Medical Vision & OCR
 ollama run hf.co/unsloth/medgemma-1.5-4b-it-GGUF:Q8_0
@@ -129,7 +129,7 @@ cd PulseGemma
 npm install
 
 # 3. Pull required Ollama models
-ollama run gemma4:12b
+ollama run 4skl/gemma4-12b-mtp
 ollama run hf.co/unsloth/medgemma-1.5-4b-it-GGUF:Q8_0
 
 # 4. Launch development server

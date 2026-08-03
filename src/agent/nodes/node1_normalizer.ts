@@ -59,9 +59,9 @@ export async function executeNode1_Normalizer(
 
   const translatedEnglishSummary = lexiconMatch 
     ? `${lexiconMatch.clinicalTerm} located at ${lexiconMatch.anatomicalSite}.` 
-    : `Patient reports: ${chiefComplaint} (${location}, Severity: ${severity}/10).`;
+    : `Patient reports ${chiefComplaint.toLowerCase()} (${location}, severity: ${severity}/10).`;
 
-  const doctorQuickSummaryFallback = `Gemma 4 NLU Summary: Patient presents with ${chiefComplaint.toLowerCase()} located at ${location.toLowerCase()} (rated ${severity}/10 pain). Associated signs include ${associated.join(', ') || 'acute discomfort'}. Immediate physician evaluation recommended.`;
+  const doctorQuickSummaryFallback = `Patient presents with ${chiefComplaint.toLowerCase()} located at ${location.toLowerCase()} (rated ${severity}/10 pain). Key associated signs include ${associated.join(', ') || 'acute distress'}. Immediate physician evaluation recommended.`;
 
   const fallbackResult: ExtractedSymptomEntity = {
     chiefComplaint,
@@ -79,31 +79,44 @@ export async function executeNode1_Normalizer(
     return fallbackResult;
   }
 
-  // 2. Call Local Gemma 4 12B Model via Ollama for Speech-to-Text NLU Processing
-  const prompt = `You are a clinical NLU assistant powered by Gemma 4 12B.
-The patient just finished speaking. Process their spoken speech-to-text transcript below (which may be in English, Spanish, Chinese, French, etc.):
+  // 2. Call Local Gemma 4 Model via Ollama for High-Precision Speech NLU & Doctor Summary Generation
+  const prompt = `You are an expert Triage Clinical NLU AI powered by Gemma 4.
+Your objective is to accurately capture the patient's oral complaints from their spoken speech-to-text transcript and generate a quick, precise, and clinically insightful summary for doctor review.
 
 PATIENT TRANSCRIPT: "${rawTranscript}"
-DETECTED LANGUAGE: ${languageCode}
+DETECTED LANGUAGE CODE: ${languageCode}
 
-Extract the clinical concepts and generate a quick summary for doctor review.
-Return ONLY a valid JSON object matching this schema:
+INSTRUCTIONS:
+1. Translate non-English patient complaints into clear medical English.
+2. Extract key clinical concepts: chief complaint, anatomical location, pain quality, 1-10 severity score, onset timing, and associated signs.
+3. Formulate a 2-sentence "doctorQuickSummary":
+   - Sentence 1: Concise presentation of the primary symptom, anatomical location, severity, and character.
+   - Sentence 2: Key associated red-flag symptoms and immediate clinical concern for attending physician review.
+
+Return ONLY a valid JSON object adhering strictly to this schema:
 {
-  "chiefComplaint": "string",
-  "anatomicalLocation": "string",
-  "painQuality": "string",
+  "chiefComplaint": "string (e.g. Acute Substernal Chest Pain)",
+  "anatomicalLocation": "string (e.g. Left Anterior Chest)",
+  "painQuality": "string (e.g. Pressure / Crushing)",
   "severityScore1To10": number,
   "onsetHoursAgo": number,
   "associatedSymptoms": ["string"],
   "detectedLanguage": "${languageCode}",
-  "translatedEnglishSummary": "English translation summary of patient words",
-  "doctorQuickSummary": "Concise 2-sentence clinical summary for physician review"
+  "translatedEnglishSummary": "Full English translation summary of patient words",
+  "doctorQuickSummary": "2-sentence high-yield clinical summary tailored for attending physician review"
 }`;
 
   return await callOllamaFlexible<ExtractedSymptomEntity>(
     prompt,
     modelName,
-    () => fallbackResult
+    () => fallbackResult,
+    undefined,
+    50000,
+    {
+      num_ctx: 1024,
+      num_predict: 384,
+      temperature: 0.1
+    }
   );
 }
 

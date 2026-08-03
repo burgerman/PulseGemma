@@ -93,5 +93,16 @@ Lab Panic Alerts: ${labAlerts.map(l => `${l.testName}=${l.value} (${l.status})`)
 Retrieved CPG Guidelines: ${retrievedGuidelines.map(g => `[${g.citationId}] ${g.text}`).join('\n')}.
 Synthesize a structured clinical triage report in JSON format.`;
 
-  return await callOllamaFlexible(prompt, selectedModel, fallbackGenerator);
+  return await callOllamaFlexible(
+    prompt,
+    selectedModel,
+    fallbackGenerator,
+    undefined,
+    50000,
+    {
+      num_ctx: 2048,
+      num_predict: 768,
+      temperature: 0.1
+    }
+  );
 }

@@ -16,12 +16,55 @@ export interface PresetEmergencyCase {
 
 export const PRESET_EMERGENCY_CASES: PresetEmergencyCase[] = [
   {
+    id: 'CASE_HEART_ATTACK_ACUTE',
+    title: '💔 Acute Heart Attack (Acute STEMI)',
+    categoryBadge: 'ESI LEVEL 1 - RESUSCITATION',
+    description: '61yo male presenting with sudden onset crushing substernal chest pain radiating to left jaw & arm, diaphoresis, ST-elevation on 12-Lead ECG, and panic elevated Troponin I (2.45 ng/mL).',
+    patientProfile: {
+      id: 'PATIENT_101',
+      name: 'Arthur Pendelton',
+      age: 61,
+      gender: 'MALE',
+      mrn: 'MRN-9041284',
+      allergies: ['Penicillin (Anaphylaxis)'],
+      pastMedicalHistory: ['Hypertension', 'Hyperlipidemia', 'Smoking (30 pack-years)'],
+      activeMedications: ['Aspirin 81mg', 'Atorvastatin 80mg', 'Lisinopril 20mg']
+    },
+    vitals: {
+      heartRate: 112,
+      systolicBP: 162,
+      diastolicBP: 98,
+      oxygenSaturation: 93,
+      temperature: 37.0,
+      respiratoryRate: 24,
+      painScore: 9
+    },
+    rawLabs: {
+      TROPONIN_I: 2.45,
+      BNP: 410,
+      D_DIMER: 450,
+      POTASSIUM: 4.5,
+      SODIUM: 138,
+      GLUCOSE: 168,
+      WBC: 10.2
+    },
+    rawTranscript: 'I feel an overwhelming crushing weight on my chest like an elephant is sitting on me, it is spreading up to my jaw and down my left arm. I am sweating profusely and feel extremely dizzy.',
+    inputLanguage: 'en',
+    image: {
+      id: 'IMG_ECG_STEMI',
+      title: '12-Lead ECG Strip (Anterior/Inferior STEMI)',
+      category: 'ECG_STRIP',
+      base64Data: SAMPLE_ECG_STEMI_IMAGE,
+      timestamp: new Date().toISOString()
+    }
+  },
+  {
     id: 'CASE_1_ACS_CHEST_PAIN',
-    title: '🫀 ACS Chest Pain (STEMI)',
+    title: '🫀 ACS Chest Pain (Spanish Dictation)',
     categoryBadge: 'ESI LEVEL 2 - HIGH RISK',
     description: '58yo male with crushing substernal chest pressure radiating to left arm and elevated Cardiac Troponin I (0.85 ng/mL).',
     patientProfile: {
-      id: 'PATIENT_101',
+      id: 'PATIENT_102',
       name: 'Robert Vance',
       age: 58,
       gender: 'MALE',

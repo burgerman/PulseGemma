@@ -98,8 +98,8 @@ OUTPUT FORMAT: Return strictly valid JSON adhering to this exact schema (no mark
         confidenceScore: parsed.confidenceScore || 0.98,
         vlmModelUsed: `Cloud VLM (${cloudModelName})`
       };
-    } catch (err) {
-      console.warn(`[VLM Service] Cloud VLM call failed. Seamlessly engaging local MedGemma 1.5 edge model.`, err);
+    } catch {
+      // Seamlessly fall back to local MedGemma 1.5 edge model
     }
   }
 
@@ -114,7 +114,12 @@ OUTPUT FORMAT: Return strictly valid JSON adhering to this exact schema (no mark
         selectedLocalModel,
         fallbackLocal,
         [image.base64Data],
-        6000
+        50000,
+        {
+          num_ctx: 2048,
+          num_predict: 512,
+          temperature: 0.1
+        }
       );
 
       if (localResult && localResult.visionFindings) {

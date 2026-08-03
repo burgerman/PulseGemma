@@ -13,7 +13,26 @@ export default defineConfig(({ mode }) => {
     envPrefix: ['VITE_', 'GEMINI_', 'VLM_'],
     server: {
       port: 3000,
-      host: true
+      host: true,
+      proxy: {
+        '/api/ollama': {
+          target: 'http://127.0.0.1:11434',
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/api\/ollama/, ''),
+          configure: (proxy) => {
+            proxy.on('error', (_err, _req, res) => {
+              if (res && !res.headersSent) {
+                res.writeHead(503, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Ollama service offline' }));
+              }
+            });
+          }
+        }
+      }
+    },
+    build: {
+      chunkSizeWarningLimit: 2000
     }
   };
 });
