@@ -33,11 +33,14 @@ Emergency Departments face severe overcrowding, documentation overhead, and lang
 PulseGemma runs fully offline via local Ollama endpoints (`http://localhost:11434`):
 
 ```bash
-# 1. Pull & Run Accelerated Gemma 4 12B MTP for Speech NLU, Translation & Synthesis
-ollama run 4skl/gemma4-12b-mtp
+# 1. Start the local Ollama background engine
+ollama serve
 
-# 2. Pull & Run MedGemma 1.5 for Medical Vision & OCR
-ollama run hf.co/unsloth/medgemma-1.5-4b-it-GGUF:Q8_0
+# 2. Pull & Run Accelerated Gemma 4 12B MTP for Speech NLU, Translation & Synthesis
+ollama pull 4skl/gemma4-12b-mtp:latest
+
+# 3. Pull & Run MedGemma 1.5 for Medical Vision & OCR
+ollama pull hf.co/unsloth/medgemma-1.5-4b-it-GGUF:Q8_0
 ```
 
 ### Deployment Options:
@@ -128,11 +131,14 @@ cd PulseGemma
 # 2. Install dependencies
 npm install
 
-# 3. Pull required Ollama models
-ollama run 4skl/gemma4-12b-mtp
-ollama run hf.co/unsloth/medgemma-1.5-4b-it-GGUF:Q8_0
+# 3. Start local Ollama background engine (required for local model calls)
+ollama serve
 
-# 4. Launch development server
+# 4. Pull required local models
+ollama pull 4skl/gemma4-12b-mtp:latest
+ollama pull hf.co/unsloth/medgemma-1.5-4b-it-GGUF:Q8_0
+
+# 5. Launch development server
 npm run dev
 ```
 
